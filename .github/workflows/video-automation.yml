@@ -47,7 +47,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install moviepy yt-dlp edge-tts libsql-experimental httpx Pillow
+          pip install "moviepy<2.0.0" yt-dlp edge-tts libsql-experimental httpx Pillow
 
       - name: Run automation pipeline
         env:
