@@ -110,6 +110,26 @@ export default function Production() {
 
     setGhTriggered(true);
     try {
+      let audioUrl = '';
+      if ((project.voiceMode === 'upload' || project.voiceMode === 'mp3-first') && project.mp3File) {
+        showToast('Uploading custom audio for GitHub Actions...', 'info');
+        try {
+          const formData = new FormData();
+          formData.append('file', project.mp3File);
+          const upRes = await fetch('https://tmpfiles.org/api/v1/upload', {
+            method: 'POST', body: formData
+          });
+          if (!upRes.ok) throw new Error('Upload failed');
+          const upData = await upRes.json();
+          if (upData?.data?.url) {
+            audioUrl = upData.data.url.replace('tmpfiles.org/', 'tmpfiles.org/api/v1/dl/');
+          }
+        } catch (e) {
+          console.error('Audio upload error:', e);
+          showToast('Failed to upload audio to temp server. Video might have no sound.', 'error');
+        }
+      }
+
       await triggerWorkflow({
         token: ghToken,
         owner: ghOwner,
@@ -125,6 +145,7 @@ export default function Production() {
           }))),
           voice_mode: project.voiceMode,
           voice_style: project.voiceStyle,
+          audio_url: audioUrl,
           title: project.title,
           description: project.description,
           tags: project.tags.join(','),

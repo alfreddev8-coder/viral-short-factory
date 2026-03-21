@@ -11,6 +11,7 @@ SCRIPT = os.environ.get("SCRIPT", "")
 SEGMENTS_JSON = os.environ.get("SEGMENTS_JSON", "[]")
 VOICE_MODE = os.environ.get("VOICE_MODE", "ai-tts")
 VOICE_STYLE = os.environ.get("VOICE_STYLE", "friendly")
+AUDIO_URL = os.environ.get("AUDIO_URL", "")
 
 # Voice mapping
 VOICE_MAP = {
@@ -38,7 +39,19 @@ def time_to_seconds(t: str) -> float:
 # Step 1: Generate voiceover with Edge TTS
 async def generate_voice():
     if VOICE_MODE in ("upload", "mp3-first"):
-        print("Using uploaded MP3 — skipping TTS")
+        if AUDIO_URL:
+            import urllib.request
+            print(f"Downloading uploaded custom audio from {AUDIO_URL}")
+            try:
+                # Provide a User-Agent to prevent 403s on some hosts
+                req = urllib.request.Request(AUDIO_URL, headers={'User-Agent': 'Mozilla/5.0'})
+                with urllib.request.urlopen(req) as response, open(OUTPUT_DIR / "narration.mp3", 'wb') as out_file:
+                    out_file.write(response.read())
+                print("Custom audio downloaded successfully.")
+            except Exception as e:
+                print(f"Failed to download custom audio: {e}")
+        else:
+            print("Using uploaded MP3 mode but no AUDIO_URL was provided. Audio will be missing.")
         return
     import edge_tts
     voice = VOICE_MAP.get(VOICE_STYLE, "en-US-GuyNeural")
@@ -52,17 +65,18 @@ def download_clips():
         query = seg.get("clipQuery", "")
         if not query:
             continue
-        # Search TikTok and download first result
-        search_url = f"https://www.tiktok.com/search?q={query.replace(' ', '%20')}"
+        # Search YouTube Shorts and download first result (TikTok blocks datacenters)
+        search_target = f"ytsearch1:{query} shorts"
         output_file = str(CLIPS_DIR / f"clip_{i:03d}.mp4")
+        print(f"Downloading clip {i}: {search_target}")
         try:
             subprocess.run([
                 "yt-dlp",
                 "--no-watermark",
                 "-o", output_file,
                 "--max-downloads", "1",
-                search_url
-            ], timeout=60, check=False)
+                search_target
+            ], timeout=90, check=True)
         except Exception as e:
             print(f"Failed to download clip {i}: {e}")
 

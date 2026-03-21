@@ -21,6 +21,9 @@ on:
       voice_style:
         description: 'Voice style'
         required: true
+      audio_url:
+        description: 'Temporary URL for uploaded custom audio'
+        required: false
       title:
         description: 'Video title'
         required: false
@@ -57,6 +60,7 @@ jobs:
           SEGMENTS_JSON: ${{ github.event.inputs.segments_json }}
           VOICE_MODE: ${{ github.event.inputs.voice_mode }}
           VOICE_STYLE: ${{ github.event.inputs.voice_style }}
+          AUDIO_URL: ${{ github.event.inputs.audio_url }}
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: python automation/pipeline.py
