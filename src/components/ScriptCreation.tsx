@@ -269,8 +269,28 @@ export default function ScriptCreation() {
 
       {/* API Key + Model */}
       <div className="glass-card rounded-xl p-4 mb-6 space-y-3">
+        {!groqApiKey ? (
+          <div className="flex-1 w-full mb-3">
+            <label className="text-xs font-semibold text-surface-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5 block">
+               <Cpu size={11} /> Groq API Key (Missing from .env)
+            </label>
+            <input
+              type="password"
+              placeholder="gsk_..."
+              value={groqApiKey}
+              onChange={(e) => handleApiKeyChange(e.target.value)}
+              className="w-full bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-sm text-white placeholder-surface-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all font-mono"
+            />
+            <p className="text-[10px] text-surface-400 mt-1">Please add VITE_GROQ_API_KEY to your .env or enter it here.</p>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 mb-3 text-xs bg-brand-500/10 border border-brand-500/20 text-brand-300 px-3 py-2 rounded-lg">
+            <CheckCircle2 size={14} />
+            <span>Groq API Key safely loaded</span>
+            <button onClick={() => setGroqApiKey('')} className="ml-auto underline hover:text-white">Change</button>
+          </div>
+        )}
         <div className="flex items-start gap-3 flex-col sm:flex-row">
-          {/* API Key removed from UI as per requirements, relying on .env */}
           <div className="flex-1 w-full">
             <label className="text-xs font-semibold text-surface-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5 block">
               <Cpu size={11} /> Model

@@ -5,7 +5,7 @@ import { triggerWorkflow, getWorkflowRunStatus, listRecentRuns, downloadArtifact
 import {
   ArrowLeft, Play, Download, CheckCircle2, XCircle, Loader2,
   FileJson, Copy, RotateCcw, Clock, Clapperboard, Scissors,
-  Github, ExternalLink, Video, Tag, FileText, Zap, Settings
+  Github, ExternalLink, Video, Tag, FileText, Zap, Settings, AlertCircle
 } from 'lucide-react';
 
 const PIPELINE_STEPS: Omit<ProductionStep, 'status' | 'progress' | 'detail'>[] = [
@@ -26,7 +26,7 @@ export default function Production() {
     project, updateProject, setStep, showToast,
     productionSteps, setProductionSteps, updateProductionStep,
     addToHistory,
-    ghToken, ghOwner, ghRepo,
+    ghToken, setGhToken, ghOwner, setGhOwner, ghRepo, setGhRepo,
   } = useStore();
 
   const [isRunning, setIsRunning] = useState(false);
@@ -303,15 +303,56 @@ export default function Production() {
         </div>
       </div>
 
-      {/* GitHub Settings (Read-only from .env) */}
+      {/* GitHub Settings */}
       <div className="glass-card rounded-xl p-4 mb-6">
-        <div className="flex items-center gap-2 text-sm font-semibold text-white w-full">
+        <div className="flex items-center gap-2 text-sm font-semibold text-white w-full mb-3">
           <Settings size={16} className="text-surface-400" />
           GitHub Actions Settings
-          <span className="text-xs text-surface-400 font-normal ml-2">
-            {ghToken && ghOwner && ghRepo ? '✅ Configured via .env' : '⚠️ Missing GH_TOKEN/OWNER/REPO in .env'}
-          </span>
+          {ghToken && ghOwner && ghRepo ? (
+            <span className="text-xs text-accent-green font-normal ml-2 flex items-center gap-1">
+              <CheckCircle2 size={12} /> Configured via .env
+            </span>
+          ) : (
+            <span className="text-xs text-accent-orange font-normal ml-2 flex items-center gap-1">
+              <AlertCircle size={12} /> Missing details
+            </span>
+          )}
         </div>
+        
+        {(!ghToken || !ghOwner || !ghRepo) && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label className="text-[10px] text-surface-400 uppercase tracking-wider mb-1 block">GitHub Token</label>
+              <input 
+                type="password" 
+                placeholder="ghp_..." 
+                value={ghToken} 
+                onChange={(e) => setGhToken(e.target.value)}
+                className="w-full bg-surface-800 border border-surface-600 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500" 
+              />
+            </div>
+            <div>
+              <label className="text-[10px] text-surface-400 uppercase tracking-wider mb-1 block">Repo Owner</label>
+              <input 
+                type="text" 
+                placeholder="Username or Org" 
+                value={ghOwner} 
+                onChange={(e) => setGhOwner(e.target.value)}
+                className="w-full bg-surface-800 border border-surface-600 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500" 
+              />
+            </div>
+            <div>
+              <label className="text-[10px] text-surface-400 uppercase tracking-wider mb-1 block">Repository Name</label>
+              <input 
+                type="text" 
+                placeholder="repo-name" 
+                value={ghRepo} 
+                onChange={(e) => setGhRepo(e.target.value)}
+                className="w-full bg-surface-800 border border-surface-600 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500" 
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
