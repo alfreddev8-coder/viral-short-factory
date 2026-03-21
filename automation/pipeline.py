@@ -59,47 +59,32 @@ async def generate_voice():
     await communicate.save(str(OUTPUT_DIR / "narration.mp3"))
     print(f"Generated voiceover with {voice}")
 
-# Step 2: Download clips from TikTok
+# Step 2: Download clips from YouTube Shorts (TikTok blocks Datacenters completely)
 def download_clips():
-    import urllib.request
-    import urllib.parse
-    import json
-    
     downloaded_count = 0
     for i, seg in enumerate(segments):
         query = seg.get("clipQuery", "")
         if not query:
             continue
         
+        # Search YouTube Shorts and download first result (TikTok blocks datacenters)
+        search_target = f"ytsearch1:{query} shorts"
         output_file = str(CLIPS_DIR / f"clip_{i:03d}.mp4")
-        print(f"Searching TikTok for clip {i}: {query}")
+        print(f"Downloading clip {i}: {query} (via YouTube Shorts fallback)")
         try:
-            search_url = f"https://www.tikwm.com/api/feed/search?keywords={urllib.parse.quote(query)}"
-            req = urllib.request.Request(search_url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req) as response:
-                data = json.loads(response.read())
-            
-            videos = data.get("data", {}).get("videos", [])
-            if not videos:
-                print(f"No TikToks found for: {query}")
-                continue
-                
-            play_url = videos[0].get("play")
-            if not play_url:
-                print(f"Video data missing play URL for: {query}")
-                continue
-                
-            print(f"Downloading clip {i} from TikWM...")
-            req_vid = urllib.request.Request(play_url, headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.tiktok.com/'})
-            with urllib.request.urlopen(req_vid) as response_vid, open(output_file, 'wb') as out_file:
-                out_file.write(response_vid.read())
-                
+            subprocess.run([
+                "yt-dlp",
+                "--no-watermark",
+                "-o", output_file,
+                "--max-downloads", "1",
+                search_target
+            ], timeout=90, check=True)
             downloaded_count += 1
         except Exception as e:
-            print(f"Failed to download clip {i} from TikTok: {e}")
+            print(f"Failed to download clip {i} from YouTube Shorts: {e}")
 
     if downloaded_count == 0:
-        raise RuntimeError("Failed to download any clips from TikTok. The video would run as a black screen. Aborting pipeline.")
+        raise RuntimeError("Failed to download any clips from YouTube Shorts. The video would run as a black screen. Aborting pipeline.")
 
 
 # Step 3: Assemble video with MoviePy

@@ -63,6 +63,7 @@ jobs:
           AUDIO_URL: ${{ github.event.inputs.audio_url }}
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          PYTHONUNBUFFERED: "1"
         run: python automation/pipeline.py
 
       - name: Upload video artifact
