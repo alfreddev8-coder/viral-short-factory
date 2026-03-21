@@ -240,7 +240,21 @@ def assemble_video():
     narration_path = OUTPUT_DIR / "narration.mp3"
     if narration_path.exists():
         audio = AudioFileClip(str(narration_path))
-        final_video = final_video.set_audio(audio.subclip(0, min(audio.duration, final_video.duration)))
+        audio_duration = audio.duration
+        
+        # If segments aren't long enough, stretch the final video to match audio
+        if final_video.duration < audio_duration:
+            print(f"Stretching final video {final_video.duration:.2f}s -> {audio_duration:.2f}s to match audio")
+            # We can use set_duration or padding. set_duration on a concatenated clip might cut logic, 
+            # so we ensure the last clip fills the gap.
+            diff = audio_duration - final_video.duration
+            if diff > 0 and clips:
+                # Extend the last clip's duration if possible, or just pad the composite
+                final_video = final_video.set_duration(audio_duration)
+        
+        final_video = final_video.set_audio(audio)
+    else:
+        print("No narration audio found to sync duration.")
 
     output_path = str(OUTPUT_DIR / f"{PROJECT_ID}_final.mp4")
     final_video.write_videofile(
