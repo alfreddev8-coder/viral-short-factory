@@ -61,23 +61,39 @@ async def generate_voice():
 
 # Step 2: Download clips from TikTok
 def download_clips():
+    import urllib.request
+    import urllib.parse
+    import json
+    
     downloaded_count = 0
     for i, seg in enumerate(segments):
         query = seg.get("clipQuery", "")
         if not query:
             continue
-        # Search TikTok and download first result
-        search_target = f"https://www.tiktok.com/search?q={query.replace(' ', '%20')}"
+        
         output_file = str(CLIPS_DIR / f"clip_{i:03d}.mp4")
-        print(f"Downloading clip {i}: {query}")
+        print(f"Searching TikTok for clip {i}: {query}")
         try:
-            subprocess.run([
-                "yt-dlp",
-                "--no-watermark",
-                "-o", output_file,
-                "--max-downloads", "1",
-                search_target
-            ], timeout=90, check=True)
+            search_url = f"https://www.tikwm.com/api/feed/search?keywords={urllib.parse.quote(query)}"
+            req = urllib.request.Request(search_url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req) as response:
+                data = json.loads(response.read())
+            
+            videos = data.get("data", {}).get("videos", [])
+            if not videos:
+                print(f"No TikToks found for: {query}")
+                continue
+                
+            play_url = videos[0].get("play")
+            if not play_url:
+                print(f"Video data missing play URL for: {query}")
+                continue
+                
+            print(f"Downloading clip {i} from TikWM...")
+            req_vid = urllib.request.Request(play_url, headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.tiktok.com/'})
+            with urllib.request.urlopen(req_vid) as response_vid, open(output_file, 'wb') as out_file:
+                out_file.write(response_vid.read())
+                
             downloaded_count += 1
         except Exception as e:
             print(f"Failed to download clip {i} from TikTok: {e}")
