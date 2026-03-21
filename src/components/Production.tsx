@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '../store';
 import type { ProductionStep } from '../types';
-import { triggerWorkflow, getWorkflowRunStatus, listRecentRuns } from '../utils/github';
+import { triggerWorkflow, getWorkflowRunStatus, listRecentRuns, downloadArtifact } from '../utils/github';
 import {
   ArrowLeft, Play, Download, CheckCircle2, XCircle, Loader2,
   FileJson, Copy, RotateCcw, Clock, Clapperboard, Scissors,
@@ -36,7 +36,21 @@ export default function Production() {
   const [ghTriggered, setGhTriggered] = useState(false);
   const [ghRunUrl, setGhRunUrl] = useState(project.workflowRunUrl || '');
   const [ghRunStatus, setGhRunStatus] = useState<string>('');
+  const [isDownloadingArtifact, setIsDownloadingArtifact] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const handleDownloadVideo = async () => {
+    if (!ghToken || !ghOwner || !ghRepo || !project.workflowRunId) return;
+    setIsDownloadingArtifact(true);
+    try {
+      await downloadArtifact(ghToken, ghOwner, ghRepo, project.workflowRunId as number);
+      showToast('Downloaded video artifact!', 'success');
+    } catch (e: any) {
+      showToast(e.message || 'Failed to download video', 'error');
+    } finally {
+      setIsDownloadingArtifact(false);
+    }
+  };
 
   const initPipeline = useCallback(() => {
     setProductionSteps(
@@ -437,10 +451,19 @@ export default function Production() {
               <Clapperboard size={32} className="text-surface-500 mx-auto mb-2" />
               <p className="text-sm text-surface-300 mb-3">
                 {isComplete || project.status === 'completed'
-                  ? 'Video pipeline completed. Download your project data and import into CapCut.'
+                  ? 'Video pipeline completed. Download your generated video directly to your device.'
                   : 'Run the pipeline first to generate your video. Use "Simulate Pipeline" for a demo or trigger GitHub Actions for real production.'}
               </p>
-              {(isComplete || project.status === 'completed') && (
+              {(isComplete || project.status === 'completed') && project.workflowRunId ? (
+                <button
+                  onClick={handleDownloadVideo}
+                  disabled={isDownloadingArtifact}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-purple to-brand-500 text-white font-bold rounded-xl transition-all hover:opacity-90 disabled:opacity-50"
+                >
+                  {isDownloadingArtifact ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                  {isDownloadingArtifact ? 'Downloading...' : 'Download Final Video'}
+                </button>
+              ) : (isComplete || project.status === 'completed') ? (
                 <button
                   onClick={() => downloadJSON(getProjectExport(), `viral-shorts-${project.id}.json`)}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-green to-accent-cyan text-white font-bold rounded-xl transition-all hover:opacity-90"
@@ -448,7 +471,7 @@ export default function Production() {
                   <Download size={18} />
                   Download Full Project
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
 
