@@ -129,7 +129,7 @@ def update_database(status="completed"):
         conn = libsql.connect(db_url, auth_token=db_token)
         conn.execute(
             "UPDATE projects SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-            [status, PROJECT_ID]
+            (status, PROJECT_ID)
         )
         conn.commit()
         print(f"Database updated: {PROJECT_ID} -> {status}")
