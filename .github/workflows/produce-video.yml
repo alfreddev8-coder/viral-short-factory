@@ -1,0 +1,57 @@
+name: Produce Video
+on:
+  workflow_dispatch:
+    inputs:
+      project_json:
+        description: 'Project JSON data from ClipForge'
+        required: true
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python (for Edge TTS)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          pip install edge-tts
+
+      - name: Parse project data
+        run: node scripts/parse-project.js '${{ github.event.inputs.project_json }}'
+
+      - name: Search & download TikTok clips
+        run: node scripts/scrape-clips.js
+        env:
+          PROJECT_DIR: ./output
+
+      - name: Generate voiceover (Edge TTS)
+        run: python scripts/generate-voice.py
+        # Uses edge-tts Python package (free, no API key)
+
+      - name: Assemble video
+        run: |
+          sudo apt-get install -y ffmpeg
+          node scripts/assemble-video.js
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-video
+          path: output/final-video.mp4
+
+      - name: Save to Turso
+        run: node scripts/save-to-turso.js
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}

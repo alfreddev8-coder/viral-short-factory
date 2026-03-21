@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+output/
+clips/
+*.mp4
+*.mp3
+__pycache__/
+*.pyc
+dist/
+build/
+.DS_Store

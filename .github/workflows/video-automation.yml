@@ -1,0 +1,69 @@
+name: Video Automation Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: 'Project ID'
+        required: true
+      niche:
+        description: 'Content niche'
+        required: true
+      script:
+        description: 'Video script'
+        required: true
+      segments_json:
+        description: 'Timestamped segments JSON'
+        required: true
+      voice_mode:
+        description: 'Voice mode (ai-tts/upload/mp3-first)'
+        required: true
+      voice_style:
+        description: 'Voice style'
+        required: true
+      title:
+        description: 'Video title'
+        required: false
+      description:
+        description: 'Video description'
+        required: false
+      tags:
+        description: 'Video tags (comma separated)'
+        required: false
+
+jobs:
+  produce-video:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
+        run: |
+          pip install moviepy yt-dlp edge-tts libsql-experimental httpx Pillow
+
+      - name: Run automation pipeline
+        env:
+          PROJECT_ID: ${{ github.event.inputs.project_id }}
+          NICHE: ${{ github.event.inputs.niche }}
+          SCRIPT: ${{ github.event.inputs.script }}
+          SEGMENTS_JSON: ${{ github.event.inputs.segments_json }}
+          VOICE_MODE: ${{ github.event.inputs.voice_mode }}
+          VOICE_STYLE: ${{ github.event.inputs.voice_style }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python automation/pipeline.py
+
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-video-${{ github.event.inputs.project_id }}
+          path: output/*.mp4
+          retention-days: 7
