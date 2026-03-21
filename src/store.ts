@@ -135,9 +135,9 @@ export const useStore = create<AppStore>((set, get) => ({
       ),
     })),
 
-  groqApiKey: import.meta.env.GROQ_API_KEY || '',
+  groqApiKey: import.meta.env.VITE_GROQ_API_KEY || '',
   setGroqApiKey: (key) => set({ groqApiKey: key }),
-  pexelsApiKey: import.meta.env.PEXELS_API_KEY || '',
+  pexelsApiKey: import.meta.env.VITE_PEXELS_API_KEY || '',
   setPexelsApiKey: (key) => set({ pexelsApiKey: key }),
   groqModel: '',
   setGroqModel: (model) => set({ groqModel: model }),
@@ -146,11 +146,11 @@ export const useStore = create<AppStore>((set, get) => ({
   modelsLoading: false,
   setModelsLoading: (v) => set({ modelsLoading: v }),
 
-  ghToken: import.meta.env.GH_TOKEN || '',
+  ghToken: import.meta.env.VITE_GH_TOKEN || '',
   setGhToken: (v) => set({ ghToken: v }),
-  ghOwner: import.meta.env.GH_OWNER || '',
+  ghOwner: import.meta.env.VITE_GH_OWNER || '',
   setGhOwner: (v) => set({ ghOwner: v }),
-  ghRepo: import.meta.env.GH_REPO || '',
+  ghRepo: import.meta.env.VITE_GH_REPO || '',
   setGhRepo: (v) => set({ ghRepo: v }),
 
   isGenerating: false,

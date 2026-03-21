@@ -8,7 +8,7 @@ import type { TimestampedSegment } from '../types';
 import {
   Sparkles, FileText, Upload, ArrowLeft, ArrowRight, Loader2,
   Clock, Hash, Trash2, Plus, RefreshCw, Wand2, AlertCircle,
-  ChevronDown, Cpu, Zap, ClipboardPaste, SplitSquareVertical,
+  ChevronDown, Cpu, Zap, ClipboardPaste, SplitSquareVertical, Video,
   CheckCircle2, Copy, Tag
 } from 'lucide-react';
 
