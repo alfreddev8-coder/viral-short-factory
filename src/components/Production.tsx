@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '../store';
 import type { ProductionStep } from '../types';
-import { triggerWorkflow, getWorkflowRunStatus, listRecentRuns, downloadArtifact } from '../utils/github';
+import { triggerWorkflow, getWorkflowRunStatus, listRecentRuns, downloadArtifact, getVideoBlobFromArtifact } from '../utils/github';
 import {
   ArrowLeft, Play, Download, CheckCircle2, XCircle, Loader2,
   FileJson, Copy, RotateCcw, Clock, Clapperboard, Scissors,
@@ -38,14 +38,24 @@ export default function Production() {
   const [ghRunUrl, setGhRunUrl] = useState(project.workflowRunUrl || '');
   const [ghRunStatus, setGhRunStatus] = useState<string>('');
   const [isDownloadingArtifact, setIsDownloadingArtifact] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(project.videoUrl || null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleDownloadVideo = async () => {
     if (!ghToken || !ghOwner || !ghRepo || !project.workflowRunId) return;
     setIsDownloadingArtifact(true);
     try {
-      await downloadArtifact(ghToken, ghOwner, ghRepo, project.workflowRunId as number);
-      showToast('Downloaded video artifact!', 'success');
+      const { blob, filename } = await getVideoBlobFromArtifact(ghToken, ghOwner, ghRepo, project.workflowRunId as number);
+      const url = window.URL.createObjectURL(blob);
+      setPreviewUrl(url);
+      updateProject({ videoUrl: url });
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      
+      showToast('Downloaded and preview ready!', 'success');
     } catch (e: any) {
       showToast(e.message || 'Failed to download video', 'error');
     } finally {
@@ -503,31 +513,47 @@ export default function Production() {
               </div>
             </div>
 
-            <div className="bg-surface-800 rounded-lg p-4 text-center">
-              <Clapperboard size={32} className="text-surface-500 mx-auto mb-2" />
-              <p className="text-sm text-surface-300 mb-3">
-                {isComplete || project.status === 'completed'
-                  ? 'Video pipeline completed. Download your generated video directly to your device.'
-                  : 'Run the pipeline first to generate your video. Use "Simulate Pipeline" for a demo or trigger GitHub Actions for real production.'}
-              </p>
-              {(isComplete || project.status === 'completed') && project.workflowRunId ? (
-                <button
-                  onClick={handleDownloadVideo}
-                  disabled={isDownloadingArtifact}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-purple to-brand-500 text-white font-bold rounded-xl transition-all hover:opacity-90 disabled:opacity-50"
-                >
-                  {isDownloadingArtifact ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
-                  {isDownloadingArtifact ? 'Downloading...' : 'Download Final Video'}
-                </button>
-              ) : (isComplete || project.status === 'completed') ? (
-                <button
-                  onClick={() => downloadJSON(getProjectExport(), `viral-shorts-${project.id}.json`)}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-green to-accent-cyan text-white font-bold rounded-xl transition-all hover:opacity-90"
-                >
-                  <Download size={18} />
-                  Download Full Project
-                </button>
-              ) : null}
+            <div className="bg-surface-800 rounded-lg overflow-hidden border border-surface-700">
+              {previewUrl ? (
+                <div className="aspect-[9/16] bg-black relative group">
+                  <video 
+                    src={previewUrl} 
+                    controls 
+                    className="w-full h-full object-contain"
+                    poster={project.segments[0]?.keywords[0] ? `https://images.pexels.com/photos/search?query=${project.segments[0].keywords[0]}` : undefined}
+                  />
+                </div>
+              ) : (
+                <div className="py-12 text-center">
+                  <Clapperboard size={48} className="text-surface-600 mx-auto mb-3" />
+                  <p className="text-sm text-surface-400 mb-4 px-6">
+                    {isComplete || project.status === 'completed'
+                      ? 'Video pipeline completed. Click below to fetch the video and enable preview.'
+                      : 'Run the pipeline first to generate your video. Real production requires GitHub Actions.'}
+                  </p>
+                </div>
+              )}
+              
+              <div className="p-4 bg-surface-800/50 backdrop-blur-sm border-t border-surface-700">
+                {(isComplete || project.status === 'completed') && project.workflowRunId ? (
+                  <button
+                    onClick={handleDownloadVideo}
+                    disabled={isDownloadingArtifact}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-purple to-brand-500 text-white font-bold rounded-xl transition-all hover:opacity-90 disabled:opacity-50"
+                  >
+                    {isDownloadingArtifact ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                    {isDownloadingArtifact ? 'Fetching Video...' : previewUrl ? 'Download Again' : 'Fetch & Preview Video'}
+                  </button>
+                ) : (isComplete || project.status === 'completed') ? (
+                  <button
+                    onClick={() => downloadJSON(getProjectExport(), `viral-shorts-${project.id}.json`)}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-green to-accent-cyan text-white font-bold rounded-xl transition-all hover:opacity-90"
+                  >
+                    <Download size={18} />
+                    Download Full Project
+                  </button>
+                ) : null}
+              </div>
             </div>
           </div>
 

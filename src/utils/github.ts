@@ -1,3 +1,5 @@
+import JSZip from 'jszip';
+
 const GH_API = 'https://api.github.com';
 const clean = (r: string) => r.split('/').pop()?.replace(/\.git$/, '') || r;
 
@@ -148,5 +150,44 @@ export async function downloadArtifact(
   a.href = objectUrl;
   a.download = `${data.artifacts[0].name}.zip`;
   a.click();
+  a.click();
   window.URL.revokeObjectURL(objectUrl);
+}
+
+export async function getVideoBlobFromArtifact(
+  token: string,
+  owner: string,
+  repo: string,
+  runId: number
+): Promise<{ blob: Blob; filename: string }> {
+  const url = `${GH_API}/repos/${owner}/${clean(repo)}/actions/runs/${runId}/artifacts`;
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github.v3+json',
+    },
+  });
+  if (!res.ok) throw new Error('Failed to list artifacts');
+  const data = await res.json();
+  if (!data.artifacts || data.artifacts.length === 0) throw new Error('No artifacts found for this run');
+
+  // Grab the first artifact
+  const artifactId = data.artifacts[0].id;
+  const dlUrl = `${GH_API}/repos/${owner}/${clean(repo)}/actions/artifacts/${artifactId}/zip`;
+  
+  const dlRes = await fetch(dlUrl, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  
+  if (!dlRes.ok) throw new Error('Failed to download artifact');
+  
+  const zipBlob = await dlRes.blob();
+  const zip = await JSZip.loadAsync(zipBlob);
+  
+  // Find the mp4 file inside the zip
+  const mp4File = Object.values(zip.files).find(f => f.name.endsWith('.mp4'));
+  if (!mp4File) throw new Error('No MP4 file found inside artifact');
+  
+  const videoBlob = await mp4File.async('blob');
+  return { blob: videoBlob, filename: mp4File.name };
 }
