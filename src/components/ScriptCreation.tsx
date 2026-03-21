@@ -68,13 +68,13 @@ function formatTime(seconds: number): string {
 
 export default function ScriptCreation() {
   const {
-    project, updateProject, setStep,
-    groqApiKey, setGroqApiKey,
+    project, updateProject, setStep, showToast, setSegments,
+    groqApiKey, setGroqApiKey, pexelsApiKey, setPexelsApiKey,
     groqModel, setGroqModel,
     groqModels, setGroqModels,
     modelsLoading, setModelsLoading,
-    isGenerating, setIsGenerating, showToast,
-    addSegment, updateSegment, removeSegment, setSegments
+    isGenerating, setIsGenerating,
+    addSegment, updateSegment, removeSegment
   } = useStore();
 
   const [mode, setMode] = useState<Mode>(project.scriptMode || 'ai');
@@ -288,6 +288,28 @@ export default function ScriptCreation() {
             <CheckCircle2 size={14} />
             <span>Groq API Key safely loaded</span>
             <button onClick={() => setGroqApiKey('')} className="ml-auto underline hover:text-white">Change</button>
+          </div>
+        )}
+
+        {/* Pexels API Key */}
+        {!pexelsApiKey ? (
+          <div className="flex-1 w-full mb-3">
+            <label className="text-xs font-semibold text-surface-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5 block">
+               <Video size={11} /> Pexels API Key (Optional fallback)
+            </label>
+            <input
+              type="password"
+              placeholder="Your Pexels API key..."
+              value={pexelsApiKey}
+              onChange={(e) => setPexelsApiKey(e.target.value)}
+              className="w-full bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-sm text-white placeholder-surface-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all font-mono"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 mb-3 text-xs bg-accent-cyan/10 border border-accent-cyan/20 text-accent-cyan px-3 py-2 rounded-lg">
+            <CheckCircle2 size={14} />
+            <span>Pexels API Key safely loaded</span>
+            <button onClick={() => setPexelsApiKey('')} className="ml-auto underline hover:text-white">Change</button>
           </div>
         )}
         <div className="flex items-start gap-3 flex-col sm:flex-row">

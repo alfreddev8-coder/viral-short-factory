@@ -1,0 +1,33 @@
+﻿2026-03-21T17:46:46.5103558Z Current runner version: '2.332.0'
+2026-03-21T17:46:46.5128377Z ##[group]Runner Image Provisioner
+2026-03-21T17:46:46.5129247Z Hosted Compute Agent
+2026-03-21T17:46:46.5129744Z Version: 20260213.493
+2026-03-21T17:46:46.5130304Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+2026-03-21T17:46:46.5131018Z Build Date: 2026-02-13T00:28:41Z
+2026-03-21T17:46:46.5131620Z Worker ID: {5d4d0bfb-cb83-4edd-82de-a077c40e2b78}
+2026-03-21T17:46:46.5132224Z Azure Region: westus3
+2026-03-21T17:46:46.5132747Z ##[endgroup]
+2026-03-21T17:46:46.5133976Z ##[group]Operating System
+2026-03-21T17:46:46.5134487Z Ubuntu
+2026-03-21T17:46:46.5135003Z 24.04.3
+2026-03-21T17:46:46.5135406Z LTS
+2026-03-21T17:46:46.5135818Z ##[endgroup]
+2026-03-21T17:46:46.5136495Z ##[group]Runner Image
+2026-03-21T17:46:46.5137014Z Image: ubuntu-24.04
+2026-03-21T17:46:46.5137439Z Version: 20260309.50.1
+2026-03-21T17:46:46.5138384Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260309.50/images/ubuntu/Ubuntu2404-Readme.md
+2026-03-21T17:46:46.5139833Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260309.50
+2026-03-21T17:46:46.5140629Z ##[endgroup]
+2026-03-21T17:46:46.5141561Z ##[group]GITHUB_TOKEN Permissions
+2026-03-21T17:46:46.5143447Z Contents: read
+2026-03-21T17:46:46.5143948Z Metadata: read
+2026-03-21T17:46:46.5144358Z Packages: read
+2026-03-21T17:46:46.5144881Z ##[endgroup]
+2026-03-21T17:46:46.5147061Z Secret source: Actions
+2026-03-21T17:46:46.5147784Z Prepare workflow directory
+2026-03-21T17:46:46.5452413Z Prepare all required actions
+2026-03-21T17:46:46.5490130Z Getting action download info
+2026-03-21T17:46:47.0025405Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-03-21T17:46:47.1537474Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-03-21T17:46:47.2203475Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-03-21T17:46:47.3991681Z Complete job name: produce-video

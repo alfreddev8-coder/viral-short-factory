@@ -1,0 +1,28 @@
+﻿2026-03-21T17:49:04.7360133Z ##[group]Run actions/upload-artifact@v4
+2026-03-21T17:49:04.7360413Z with:
+2026-03-21T17:49:04.7360587Z   name: final-video-wvar1xid
+2026-03-21T17:49:04.7360804Z   path: output/*.mp4
+2026-03-21T17:49:04.7360995Z   retention-days: 7
+2026-03-21T17:49:04.7361174Z   if-no-files-found: warn
+2026-03-21T17:49:04.7361385Z   compression-level: 6
+2026-03-21T17:49:04.7361575Z   overwrite: false
+2026-03-21T17:49:04.7361754Z   include-hidden-files: false
+2026-03-21T17:49:04.7361962Z env:
+2026-03-21T17:49:04.7362186Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+2026-03-21T17:49:04.7362562Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+2026-03-21T17:49:04.7362947Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+2026-03-21T17:49:04.7363285Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+2026-03-21T17:49:04.7363635Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+2026-03-21T17:49:04.7363968Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+2026-03-21T17:49:04.7364295Z ##[endgroup]
+2026-03-21T17:49:04.9391946Z With the provided path, there will be 1 file uploaded
+2026-03-21T17:49:04.9397318Z Artifact name is valid!
+2026-03-21T17:49:04.9398395Z Root directory input is valid!
+2026-03-21T17:49:05.2003978Z Beginning upload of artifact content to blob storage
+2026-03-21T17:49:05.7537587Z Uploaded bytes 777861
+2026-03-21T17:49:05.8186552Z Finished uploading artifact content to blob storage!
+2026-03-21T17:49:05.8189327Z SHA256 digest of uploaded artifact zip is 3df275412a0e1213663746261efe1d06083807161b39036e9ede265ec0390e35
+2026-03-21T17:49:05.8191585Z Finalizing artifact upload
+2026-03-21T17:49:05.9487358Z Artifact final-video-wvar1xid.zip successfully finalized. Artifact ID 6040897765
+2026-03-21T17:49:05.9488467Z Artifact final-video-wvar1xid has been successfully uploaded! Final size is 777861 bytes. Artifact ID is 6040897765
+2026-03-21T17:49:05.9495530Z Artifact download URL: https://github.com/alfreddev8-coder/viral-short-factory/actions/runs/23385188424/artifacts/6040897765

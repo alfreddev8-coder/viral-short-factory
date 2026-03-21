@@ -1,0 +1,8 @@
+2026-03-21T17:46:44.1280000Z Evaluating produce-video.if
+2026-03-21T17:46:44.1280000Z Evaluating: success()
+2026-03-21T17:46:44.1280000Z Result: true
+2026-03-21T17:46:44.1330000Z Job is waiting for a hosted runner to come online.
+2026-03-21T17:46:44.1300000Z Job is about to start running on the hosted runner: GitHub Actions 1000000072
+2026-03-21T17:46:44.1300000Z Requested labels: ubuntu-latest
+2026-03-21T17:46:44.1300000Z Job defined at: alfreddev8-coder/viral-short-factory/.github/workflows/video-automation.yml@refs/heads/main
+2026-03-21T17:46:44.1300000Z Waiting for a runner to pick up this job...

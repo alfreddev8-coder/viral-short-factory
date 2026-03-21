@@ -30,6 +30,8 @@ interface AppStore {
   // API
   groqApiKey: string;
   setGroqApiKey: (key: string) => void;
+  pexelsApiKey: string;
+  setPexelsApiKey: (key: string) => void;
   groqModel: string;
   setGroqModel: (model: string) => void;
   groqModels: GroqModel[];
@@ -135,6 +137,8 @@ export const useStore = create<AppStore>((set, get) => ({
 
   groqApiKey: import.meta.env.GROQ_API_KEY || '',
   setGroqApiKey: (key) => set({ groqApiKey: key }),
+  pexelsApiKey: import.meta.env.PEXELS_API_KEY || '',
+  setPexelsApiKey: (key) => set({ pexelsApiKey: key }),
   groqModel: '',
   setGroqModel: (model) => set({ groqModel: model }),
   groqModels: [],

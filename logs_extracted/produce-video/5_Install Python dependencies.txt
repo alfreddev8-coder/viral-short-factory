@@ -1,0 +1,121 @@
+﻿2026-03-21T17:47:11.7195005Z ##[group]Run pip install "moviepy<2.0.0" yt-dlp edge-tts libsql-experimental httpx Pillow
+2026-03-21T17:47:11.7195608Z [36;1mpip install "moviepy<2.0.0" yt-dlp edge-tts libsql-experimental httpx Pillow[0m
+2026-03-21T17:47:11.7226524Z shell: /usr/bin/bash -e {0}
+2026-03-21T17:47:11.7226923Z env:
+2026-03-21T17:47:11.7296421Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+2026-03-21T17:47:11.7296930Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+2026-03-21T17:47:11.7297370Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+2026-03-21T17:47:11.7297786Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+2026-03-21T17:47:11.7298131Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+2026-03-21T17:47:11.7298483Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+2026-03-21T17:47:11.7298794Z ##[endgroup]
+2026-03-21T17:47:13.8840219Z Collecting moviepy<2.0.0
+2026-03-21T17:47:13.9674512Z   Downloading moviepy-1.0.3.tar.gz (388 kB)
+2026-03-21T17:47:14.0545670Z   Installing build dependencies: started
+2026-03-21T17:47:14.8711579Z   Installing build dependencies: finished with status 'done'
+2026-03-21T17:47:14.8717673Z   Getting requirements to build wheel: started
+2026-03-21T17:47:15.2529116Z   Getting requirements to build wheel: finished with status 'done'
+2026-03-21T17:47:15.2536701Z   Preparing metadata (pyproject.toml): started
+2026-03-21T17:47:15.4257126Z   Preparing metadata (pyproject.toml): finished with status 'done'
+2026-03-21T17:47:15.5259657Z Collecting yt-dlp
+2026-03-21T17:47:15.5390269Z   Downloading yt_dlp-2026.3.17-py3-none-any.whl.metadata (182 kB)
+2026-03-21T17:47:15.5885521Z Collecting edge-tts
+2026-03-21T17:47:15.6004152Z   Downloading edge_tts-7.2.7-py3-none-any.whl.metadata (5.5 kB)
+2026-03-21T17:47:15.6537130Z Collecting libsql-experimental
+2026-03-21T17:47:15.6663476Z   Downloading libsql_experimental-0.0.55-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.8 kB)
+2026-03-21T17:47:15.6906450Z Collecting httpx
+2026-03-21T17:47:15.7009367Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+2026-03-21T17:47:15.8704600Z Collecting Pillow
+2026-03-21T17:47:15.8810037Z   Downloading pillow-12.1.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.8 kB)
+2026-03-21T17:47:15.9023649Z Collecting decorator<5.0,>=4.0.2 (from moviepy<2.0.0)
+2026-03-21T17:47:15.9135550Z   Downloading decorator-4.4.2-py2.py3-none-any.whl.metadata (4.2 kB)
+2026-03-21T17:47:15.9438380Z Collecting imageio<3.0,>=2.5 (from moviepy<2.0.0)
+2026-03-21T17:47:15.9547421Z   Downloading imageio-2.37.3-py3-none-any.whl.metadata (9.7 kB)
+2026-03-21T17:47:15.9834722Z Collecting imageio_ffmpeg>=0.2.0 (from moviepy<2.0.0)
+2026-03-21T17:47:15.9941902Z   Downloading imageio_ffmpeg-0.6.0-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+2026-03-21T17:47:16.0265962Z Collecting tqdm<5.0,>=4.11.2 (from moviepy<2.0.0)
+2026-03-21T17:47:16.0369015Z   Downloading tqdm-4.67.3-py3-none-any.whl.metadata (57 kB)
+2026-03-21T17:47:16.2342438Z Collecting numpy>=1.17.3 (from moviepy<2.0.0)
+2026-03-21T17:47:16.2445155Z   Downloading numpy-2.4.3-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+2026-03-21T17:47:16.2715078Z Collecting requests<3.0,>=2.8.1 (from moviepy<2.0.0)
+2026-03-21T17:47:16.2822754Z   Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+2026-03-21T17:47:16.2991238Z Collecting proglog<=1.0.0 (from moviepy<2.0.0)
+2026-03-21T17:47:16.3097344Z   Downloading proglog-0.1.12-py3-none-any.whl.metadata (794 bytes)
+2026-03-21T17:47:16.3969293Z Collecting charset_normalizer<4,>=2 (from requests<3.0,>=2.8.1->moviepy<2.0.0)
+2026-03-21T17:47:16.4071294Z   Downloading charset_normalizer-3.4.6-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+2026-03-21T17:47:16.4278014Z Collecting idna<4,>=2.5 (from requests<3.0,>=2.8.1->moviepy<2.0.0)
+2026-03-21T17:47:16.4378803Z   Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+2026-03-21T17:47:16.4634351Z Collecting urllib3<3,>=1.21.1 (from requests<3.0,>=2.8.1->moviepy<2.0.0)
+2026-03-21T17:47:16.4736936Z   Downloading urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
+2026-03-21T17:47:16.4972966Z Collecting certifi>=2017.4.17 (from requests<3.0,>=2.8.1->moviepy<2.0.0)
+2026-03-21T17:47:16.5076073Z   Downloading certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
+2026-03-21T17:47:16.9497885Z Collecting aiohttp<4.0.0,>=3.8.0 (from edge-tts)
+2026-03-21T17:47:16.9604318Z   Downloading aiohttp-3.13.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.1 kB)
+2026-03-21T17:47:16.9809384Z Collecting tabulate<1.0.0,>=0.4.4 (from edge-tts)
+2026-03-21T17:47:16.9911038Z   Downloading tabulate-0.10.0-py3-none-any.whl.metadata (40 kB)
+2026-03-21T17:47:17.0168988Z Collecting typing-extensions<5.0.0,>=4.1.0 (from edge-tts)
+2026-03-21T17:47:17.0275531Z   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+2026-03-21T17:47:17.0472152Z Collecting aiohappyeyeballs>=2.5.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts)
+2026-03-21T17:47:17.0573002Z   Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl.metadata (5.9 kB)
+2026-03-21T17:47:17.0735084Z Collecting aiosignal>=1.4.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts)
+2026-03-21T17:47:17.0838155Z   Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+2026-03-21T17:47:17.1047473Z Collecting attrs>=17.3.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts)
+2026-03-21T17:47:17.1147415Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+2026-03-21T17:47:17.1763742Z Collecting frozenlist>=1.1.1 (from aiohttp<4.0.0,>=3.8.0->edge-tts)
+2026-03-21T17:47:17.1867712Z   Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+2026-03-21T17:47:17.4235678Z Collecting multidict<7.0,>=4.5 (from aiohttp<4.0.0,>=3.8.0->edge-tts)
+2026-03-21T17:47:17.4341120Z   Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+2026-03-21T17:47:17.4846135Z Collecting propcache>=0.2.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts)
+2026-03-21T17:47:17.4950575Z   Downloading propcache-0.4.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (13 kB)
+2026-03-21T17:47:17.7585689Z Collecting yarl<2.0,>=1.17.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts)
+2026-03-21T17:47:17.7690541Z   Downloading yarl-1.23.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+2026-03-21T17:47:17.8068702Z Collecting anyio (from httpx)
+2026-03-21T17:47:17.8170126Z   Downloading anyio-4.12.1-py3-none-any.whl.metadata (4.3 kB)
+2026-03-21T17:47:17.8386167Z Collecting httpcore==1.* (from httpx)
+2026-03-21T17:47:17.8486531Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+2026-03-21T17:47:17.8669973Z Collecting h11>=0.16 (from httpcore==1.*->httpx)
+2026-03-21T17:47:17.8769323Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+2026-03-21T17:47:17.9012625Z Downloading decorator-4.4.2-py2.py3-none-any.whl (9.2 kB)
+2026-03-21T17:47:17.9153984Z Downloading imageio-2.37.3-py3-none-any.whl (317 kB)
+2026-03-21T17:47:17.9527925Z Downloading proglog-0.1.12-py3-none-any.whl (6.3 kB)
+2026-03-21T17:47:17.9643899Z Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+2026-03-21T17:47:17.9790485Z Downloading charset_normalizer-3.4.6-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (204 kB)
+2026-03-21T17:47:18.0037580Z Downloading idna-3.11-py3-none-any.whl (71 kB)
+2026-03-21T17:47:18.0185013Z Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)
+2026-03-21T17:47:18.0337179Z Downloading urllib3-2.6.3-py3-none-any.whl (131 kB)
+2026-03-21T17:47:18.0541187Z Downloading yt_dlp-2026.3.17-py3-none-any.whl (3.3 MB)
+2026-03-21T17:47:18.2040935Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 23.3 MB/s  0:00:00
+2026-03-21T17:47:18.2155986Z Downloading edge_tts-7.2.7-py3-none-any.whl (30 kB)
+2026-03-21T17:47:18.2274205Z Downloading aiohttp-3.13.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.7 MB)
+2026-03-21T17:47:18.2766506Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 34.8 MB/s  0:00:00
+2026-03-21T17:47:18.2873370Z Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (246 kB)
+2026-03-21T17:47:18.3033973Z Downloading tabulate-0.10.0-py3-none-any.whl (39 kB)
+2026-03-21T17:47:18.3160000Z Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+2026-03-21T17:47:18.3290580Z Downloading yarl-1.23.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (102 kB)
+2026-03-21T17:47:18.3431409Z Downloading libsql_experimental-0.0.55-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (5.3 MB)
+2026-03-21T17:47:18.4412324Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.3/5.3 MB 54.2 MB/s  0:00:00
+2026-03-21T17:47:18.4515101Z Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+2026-03-21T17:47:18.4639719Z Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+2026-03-21T17:47:18.4759617Z Downloading pillow-12.1.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (7.0 MB)
+2026-03-21T17:47:18.5614217Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.0/7.0 MB 83.3 MB/s  0:00:00
+2026-03-21T17:47:18.5721484Z Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl (15 kB)
+2026-03-21T17:47:18.5843449Z Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+2026-03-21T17:47:18.5966109Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+2026-03-21T17:47:18.6094552Z Downloading certifi-2026.2.25-py3-none-any.whl (153 kB)
+2026-03-21T17:47:18.6217291Z Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (231 kB)
+2026-03-21T17:47:18.6345472Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+2026-03-21T17:47:18.6495377Z Downloading imageio_ffmpeg-0.6.0-py3-none-manylinux2014_x86_64.whl (29.5 MB)
+2026-03-21T17:47:18.8358850Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 29.5/29.5 MB 159.2 MB/s  0:00:00
+2026-03-21T17:47:18.8469314Z Downloading numpy-2.4.3-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.9 MB)
+2026-03-21T17:47:18.9155173Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.9/16.9 MB 251.6 MB/s  0:00:00
+2026-03-21T17:47:18.9263919Z Downloading propcache-0.4.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (210 kB)
+2026-03-21T17:47:18.9395131Z Downloading anyio-4.12.1-py3-none-any.whl (113 kB)
+2026-03-21T17:47:19.0287651Z Building wheels for collected packages: moviepy
+2026-03-21T17:47:19.0295107Z   Building wheel for moviepy (pyproject.toml): started
+2026-03-21T17:47:19.2550426Z   Building wheel for moviepy (pyproject.toml): finished with status 'done'
+2026-03-21T17:47:19.2557101Z   Created wheel for moviepy: filename=moviepy-1.0.3-py3-none-any.whl size=110796 sha256=6e129a09002269ff2e65ecd26c2a2ca8bf6d67260327881e942d620c2873e5ba
+2026-03-21T17:47:19.2558530Z   Stored in directory: /home/runner/.cache/pip/wheels/83/b1/d9/119ef7c144b44d591ec0a9a140465133c23ea95d2a161184ba
+2026-03-21T17:47:19.2581450Z Successfully built moviepy
+2026-03-21T17:47:19.3179800Z Installing collected packages: yt-dlp, urllib3, typing-extensions, tqdm, tabulate, propcache, Pillow, numpy, multidict, libsql-experimental, imageio_ffmpeg, idna, h11, frozenlist, decorator, charset_normalizer, certifi, attrs, aiohappyeyeballs, yarl, requests, proglog, imageio, httpcore, anyio, aiosignal, moviepy, httpx, aiohttp, edge-tts
+2026-03-21T17:47:24.0234971Z 
+2026-03-21T17:47:24.0252160Z Successfully installed Pillow-12.1.1 aiohappyeyeballs-2.6.1 aiohttp-3.13.3 aiosignal-1.4.0 anyio-4.12.1 attrs-26.1.0 certifi-2026.2.25 charset_normalizer-3.4.6 decorator-4.4.2 edge-tts-7.2.7 frozenlist-1.8.0 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.11 imageio-2.37.3 imageio_ffmpeg-0.6.0 libsql-experimental-0.0.55 moviepy-1.0.3 multidict-6.7.1 numpy-2.4.3 proglog-0.1.12 propcache-0.4.1 requests-2.32.5 tabulate-0.10.0 tqdm-4.67.3 typing-extensions-4.15.0 urllib3-2.6.3 yarl-1.23.0 yt-dlp-2026.3.17

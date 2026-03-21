@@ -27,6 +27,7 @@ export default function Production() {
     productionSteps, setProductionSteps, updateProductionStep,
     addToHistory,
     ghToken, setGhToken, ghOwner, setGhOwner, ghRepo, setGhRepo,
+    pexelsApiKey,
   } = useStore();
 
   const [isRunning, setIsRunning] = useState(false);
@@ -160,6 +161,7 @@ export default function Production() {
           title: project.title,
           description: project.description,
           tags: project.tags.join(','),
+          PEXELS_API_KEY: pexelsApiKey,
         },
       });
       showToast('✅ GitHub Actions workflow triggered!', 'success');
