@@ -112,6 +112,8 @@ def download_clips():
             try:
                 subprocess.run([
                     "yt-dlp",
+                    "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+                    "--merge-output-format", "mp4",
                     "-o", output_file,
                     "--max-downloads", "1",
                     search_target
