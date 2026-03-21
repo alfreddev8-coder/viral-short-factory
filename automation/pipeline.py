@@ -110,15 +110,19 @@ def download_clips():
         
         # 1) Try Pexels (Highest quality, cleanest)
         if PEXELS_API_KEY:
+            # print(f"DEBUG: Pexels key loaded: {PEXELS_API_KEY[:4]}...{PEXELS_API_KEY[-4:]}")
             for query in queries:
                 if success: break
                 print(f"Downloading clip {i}: '{query}' (Trying Pexels)")
                 try:
                     safe_query = urllib.parse.quote(query)
+                    # Pexels supports per_page=1 and orientation=portrait for vertical clips
                     pexels_url = f"https://api.pexels.com/videos/search?query={safe_query}&per_page=1&orientation=portrait"
                     req = urllib.request.Request(pexels_url)
-                    req.add_header("Authorization", PEXELS_API_KEY)
-                    with urllib.request.urlopen(req, timeout=10) as res:
+                    req.add_header("Authorization", PEXELS_API_KEY.strip())
+                    req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+                    
+                    with urllib.request.urlopen(req, timeout=15) as res:
                         data = json.loads(res.read())
                     
                     videos = data.get('videos', [])
