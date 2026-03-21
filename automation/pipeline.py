@@ -90,15 +90,16 @@ def download_clips():
         main_query = seg.get("clipQuery", "").strip()
         if main_query:
             queries.append(main_query)
-            
-        keywords = seg.get("keywords", [])
-        if isinstance(keywords, list):
-            for kw in keywords:
-                if kw and kw.strip() not in queries:
-                    queries.append(kw.strip())
-        elif isinstance(keywords, str) and keywords.strip():
-            if keywords.strip() not in queries:
-                queries.append(keywords.strip())
+        queries = [seg["clipQuery"]] if seg.get("clipQuery") else []
+        
+        # Ensure keywords are processed as a list of strings
+        keywords_data = seg.get("keywords", [])
+        if isinstance(keywords_data, str): # Handle case where keywords might be a single string
+            keywords_data = [keywords_data]
+        
+        for kw in keywords_data:
+            if kw and kw.strip() not in queries:
+                queries.append(kw.strip())
                 
         if not queries:
             queries = ["random aesthetic nature"]
@@ -110,21 +111,27 @@ def download_clips():
         
         # 1) Try Pexels (Highest quality, cleanest)
         if PEXELS_API_KEY:
-            # print(f"DEBUG: Pexels key loaded: {PEXELS_API_KEY[:4]}...{PEXELS_API_KEY[-4:]}")
+            headers = {
+                "Authorization": PEXELS_API_KEY.strip(),
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+            }
             for query in queries:
                 if success: break
                 print(f"Downloading clip {i}: '{query}' (Trying Pexels)")
                 try:
-                    safe_query = urllib.parse.quote(query)
-                    # Pexels supports per_page=1 and orientation=portrait for vertical clips
-                    pexels_url = f"https://api.pexels.com/videos/search?query={safe_query}&per_page=1&orientation=portrait"
-                    req = urllib.request.Request(pexels_url)
-                    req.add_header("Authorization", PEXELS_API_KEY.strip())
-                    req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+                    pexels_url = "https://api.pexels.com/videos/search"
+                    params = {
+                        "query": query,
+                        "per_page": 1,
+                        "orientation": "portrait"
+                    }
+                    res = requests.get(pexels_url, headers=headers, params=params, timeout=15)
                     
-                    with urllib.request.urlopen(req, timeout=15) as res:
-                        data = json.loads(res.read())
-                    
+                    if res.status_code != 200:
+                        print(f"Pexels API error {res.status_code} for query '{query}': {res.text[:200]}...")
+                        continue
+
+                    data = res.json()
                     videos = data.get('videos', [])
                     if videos:
                         # Get the best quality mp4 link
@@ -133,13 +140,21 @@ def download_clips():
                         best_file = next((f for f in video_files if f.get('width', 0) >= 720), video_files[0])
                         link = best_file.get('link')
                         if link:
-                            with urllib.request.urlopen(link, timeout=30) as v_res:
-                                with open(output_file, 'wb') as f:
-                                    f.write(v_res.read())
+                            v_res = requests.get(link, stream=True, timeout=30)
+                            v_res.raise_for_status() # Raise an exception for HTTP errors
+                            with open(output_file, 'wb') as f:
+                                for chunk in v_res.iter_content(chunk_size=8192):
+                                    f.write(chunk)
                             print(f"Successfully downloaded clean stock from Pexels using '{query}'.")
                             success = True
-                except Exception as e:
+                        else:
+                            print(f"Pexels: No video link found for query '{query}'.")
+                    else:
+                        print(f"Pexels: No videos found for query '{query}'.")
+                except requests.exceptions.RequestException as e:
                     print(f"Pexels failed for '{query}': {e}")
+                except Exception as e:
+                    print(f"Pexels unexpected error for '{query}': {e}")
 
         # 2) Try TikTok (No watermark via TikWM)
         if not success:
@@ -147,24 +162,32 @@ def download_clips():
                 if success: break
                 print(f"Downloading clip {i}: '{query}' (Trying TikTok)")
                 try:
-                    safe_query = urllib.parse.quote(query + " 4k no text")
-                    tikwm_url = f"https://www.tikwm.com/api/feed/search?keywords={safe_query}&count=5"
-                    req = urllib.request.Request(tikwm_url, headers={'User-Agent': 'Mozilla/5.0'})
-                    with urllib.request.urlopen(req, timeout=15) as res:
-                        data = json.loads(res.read())
+                    tikwm_url = "https://www.tikwm.com/api/feed/search"
+                    params = {"keywords": query + " 4k no text", "count": 5}
+                    headers = {'User-Agent': 'Mozilla/5.0'}
+                    res = requests.get(tikwm_url, params=params, headers=headers, timeout=15)
+                    res.raise_for_status() # Raise an exception for HTTP errors
                     
+                    data = res.json()
                     videos = data.get('data', {}).get('videos', [])
                     if videos and len(videos) > 0:
                         play_url = videos[0].get('play')
                         if play_url:
-                            video_req = urllib.request.Request(play_url, headers={'User-Agent': 'Mozilla/5.0'})
-                            with urllib.request.urlopen(video_req, timeout=30) as v_res:
-                                with open(output_file, 'wb') as f:
-                                    f.write(v_res.read())
+                            v_res = requests.get(play_url, stream=True, timeout=30, headers=headers)
+                            v_res.raise_for_status() # Raise an exception for HTTP errors
+                            with open(output_file, 'wb') as f:
+                                for chunk in v_res.iter_content(chunk_size=8192):
+                                    f.write(chunk)
                             print(f"Successfully downloaded clip {i} from TikTok using '{query}'.")
                             success = True
-                except Exception as e:
+                        else:
+                            print(f"TikTok: No play URL found for query '{query}'.")
+                    else:
+                        print(f"TikTok: No videos found for query '{query}'.")
+                except requests.exceptions.RequestException as e:
                     print(f"TikTok failed for '{query}': {e}")
+                except Exception as e:
+                    print(f"TikTok unexpected error for '{query}': {e}")
                 if not success: time.sleep(0.5)
 
         # 3) Fallback to YouTube B-Roll (Search for documentaries/raw footage to crop)

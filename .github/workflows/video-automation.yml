@@ -53,7 +53,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install "moviepy<2.0.0" yt-dlp edge-tts libsql-experimental httpx "Pillow<10.0.0" gTTS
+          pip install "moviepy<2.0.0" yt-dlp edge-tts libsql-experimental httpx "Pillow<10.0.0" gTTS requests
 
       - name: Run automation pipeline
         env:
