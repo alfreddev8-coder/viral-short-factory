@@ -49,9 +49,9 @@ async def generate_voice():
                     out_file.write(response.read())
                 print("Custom audio downloaded successfully.")
             except Exception as e:
-                print(f"Failed to download custom audio: {e}")
+                raise RuntimeError(f"Failed to download custom audio from {AUDIO_URL}: {e}")
         else:
-            print("Using uploaded MP3 mode but no AUDIO_URL was provided. Audio will be missing.")
+            raise RuntimeError("Using uploaded MP3 mode but no custom AUDIO_URL was provided. Audio is missing. Aborting.")
         return
     import edge_tts
     voice = VOICE_MAP.get(VOICE_STYLE, "en-US-GuyNeural")
@@ -61,14 +61,15 @@ async def generate_voice():
 
 # Step 2: Download clips from TikTok
 def download_clips():
+    downloaded_count = 0
     for i, seg in enumerate(segments):
         query = seg.get("clipQuery", "")
         if not query:
             continue
-        # Search YouTube Shorts and download first result (TikTok blocks datacenters)
-        search_target = f"ytsearch1:{query} shorts"
+        # Search TikTok and download first result
+        search_target = f"https://www.tiktok.com/search?q={query.replace(' ', '%20')}"
         output_file = str(CLIPS_DIR / f"clip_{i:03d}.mp4")
-        print(f"Downloading clip {i}: {search_target}")
+        print(f"Downloading clip {i}: {query}")
         try:
             subprocess.run([
                 "yt-dlp",
@@ -77,8 +78,13 @@ def download_clips():
                 "--max-downloads", "1",
                 search_target
             ], timeout=90, check=True)
+            downloaded_count += 1
         except Exception as e:
-            print(f"Failed to download clip {i}: {e}")
+            print(f"Failed to download clip {i} from TikTok: {e}")
+
+    if downloaded_count == 0:
+        raise RuntimeError("Failed to download any clips from TikTok. The video would run as a black screen. Aborting pipeline.")
+
 
 # Step 3: Assemble video with MoviePy
 def assemble_video():
@@ -142,7 +148,7 @@ def update_database(status="completed"):
         import libsql_experimental as libsql
         conn = libsql.connect(db_url, auth_token=db_token)
         conn.execute(
-            "UPDATE projects SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            "UPDATE projects SET status = ? WHERE id = ?",
             (status, PROJECT_ID)
         )
         conn.commit()
