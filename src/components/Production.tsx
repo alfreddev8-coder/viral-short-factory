@@ -114,14 +114,15 @@ export default function Production() {
         showToast('Uploading custom audio for GitHub Actions...', 'info');
         try {
           const formData = new FormData();
-          formData.append('file', project.mp3File);
-          const upRes = await fetch('https://tmpfiles.org/api/v1/upload', {
+          formData.append('reqtype', 'fileupload');
+          formData.append('fileToUpload', project.mp3File);
+          const upRes = await fetch('https://catbox.moe/user/api.php', {
             method: 'POST', body: formData
           });
           if (!upRes.ok) throw new Error('Upload failed');
-          const upData = await upRes.json();
-          if (upData?.data?.url) {
-            audioUrl = upData.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+          const finalUrl = await upRes.text();
+          if (finalUrl && finalUrl.startsWith('http')) {
+            audioUrl = finalUrl.trim();
           }
         } catch (e) {
           console.error('Audio upload error:', e);

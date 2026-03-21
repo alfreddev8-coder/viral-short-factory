@@ -1,4 +1,5 @@
 const GH_API = 'https://api.github.com';
+const clean = (r: string) => r.split('/').pop()?.replace(/\.git$/, '') || r;
 
 interface WorkflowDispatchInput {
   token: string;
@@ -18,7 +19,7 @@ interface WorkflowRun {
 }
 
 export async function triggerWorkflow(opts: WorkflowDispatchInput): Promise<{ success: boolean }> {
-  const url = `${GH_API}/repos/${opts.owner}/${opts.repo}/actions/workflows/${opts.workflowFile}/dispatches`;
+  const url = `${GH_API}/repos/${opts.owner}/${clean(opts.repo)}/actions/workflows/${opts.workflowFile}/dispatches`;
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -44,7 +45,7 @@ export async function getLatestWorkflowRun(
   repo: string,
   workflowFile: string
 ): Promise<WorkflowRun | null> {
-  const url = `${GH_API}/repos/${owner}/${repo}/actions/workflows/${workflowFile}/runs?per_page=1`;
+  const url = `${GH_API}/repos/${owner}/${clean(repo)}/actions/workflows/${workflowFile}/runs?per_page=1`;
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -72,7 +73,7 @@ export async function getWorkflowRunStatus(
   repo: string,
   runId: number
 ): Promise<WorkflowRun | null> {
-  const url = `${GH_API}/repos/${owner}/${repo}/actions/runs/${runId}`;
+  const url = `${GH_API}/repos/${owner}/${clean(repo)}/actions/runs/${runId}`;
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -96,7 +97,7 @@ export async function listRecentRuns(
   repo: string,
   perPage = 5
 ): Promise<WorkflowRun[]> {
-  const url = `${GH_API}/repos/${owner}/${repo}/actions/runs?per_page=${perPage}`;
+  const url = `${GH_API}/repos/${owner}/${clean(repo)}/actions/runs?per_page=${perPage}`;
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -120,7 +121,7 @@ export async function downloadArtifact(
   repo: string,
   runId: number
 ): Promise<void> {
-  const url = `${GH_API}/repos/${owner}/${repo}/actions/runs/${runId}/artifacts`;
+  const url = `${GH_API}/repos/${owner}/${clean(repo)}/actions/runs/${runId}/artifacts`;
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -133,7 +134,7 @@ export async function downloadArtifact(
 
   // Grab the first artifact (usually the final-video zip)
   const artifactId = data.artifacts[0].id;
-  const dlUrl = `${GH_API}/repos/${owner}/${repo}/actions/artifacts/${artifactId}/zip`;
+  const dlUrl = `${GH_API}/repos/${owner}/${clean(repo)}/actions/artifacts/${artifactId}/zip`;
   
   const dlRes = await fetch(dlUrl, {
     headers: { Authorization: `Bearer ${token}` }
