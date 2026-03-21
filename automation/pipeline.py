@@ -76,62 +76,91 @@ async def generate_voice():
         tts.save(str(OUTPUT_DIR / "narration.mp3"))
         print("Generated voiceover with gTTS fallback")
 
-# Step 2: Download clips (Try TikTok first, fallback to YouTube Shorts)
+# Step 2: Download clips (Try TikTok first for all keywords, fallback to YouTube Shorts)
 def download_clips():
     import urllib.request
     import urllib.parse
+    import time
+    
     downloaded_count = 0
     for i, seg in enumerate(segments):
-        query = seg.get("clipQuery", "")
-        if not query:
-            continue
-        
+        queries = []
+        main_query = seg.get("clipQuery", "").strip()
+        if main_query:
+            queries.append(main_query)
+            
+        keywords = seg.get("keywords", [])
+        if isinstance(keywords, list):
+            for kw in keywords:
+                if kw and kw.strip() not in queries:
+                    queries.append(kw.strip())
+        elif isinstance(keywords, str) and keywords.strip():
+            if keywords.strip() not in queries:
+                queries.append(keywords.strip())
+                
+        if not queries:
+            queries = ["random aesthetic video"]
+            
         output_file = str(CLIPS_DIR / f"clip_{i:03d}.mp4")
         success = False
         
-        # 1) Try TikTok via TikWM API (Fast, no-watermark)
-        print(f"Downloading clip {i}: {query} (Trying TikTok first)")
-        try:
-            safe_query = urllib.parse.quote(query + " shorts")
-            tikwm_url = f"https://www.tikwm.com/api/feed/search?keywords={safe_query}&count=5"
-            req = urllib.request.Request(tikwm_url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req, timeout=15) as res:
-                data = json.loads(res.read())
-            
-            videos = data.get('data', {}).get('videos', [])
-            if videos and len(videos) > 0:
-                play_url = videos[0].get('play')
-                if play_url:
-                    video_req = urllib.request.Request(play_url, headers={'User-Agent': 'Mozilla/5.0'})
-                    with urllib.request.urlopen(video_req, timeout=30) as v_res:
-                        with open(output_file, 'wb') as f:
-                            f.write(v_res.read())
-                    print(f"Successfully downloaded clip {i} from TikTok.")
-                    success = True
-            if not success:
-                print(f"TikTok API returned no valid video for clip {i}.")
-        except Exception as e:
-            print(f"TikTok search/download failed for clip {i}: {e}")
-            
-        # 2) Fallback to YouTube Shorts
-        if not success:
-            search_target = f"ytsearch1:{query} shorts"
-            print(f"Downloading clip {i}: {query} (via YouTube Shorts fallback)")
-            try:
-                subprocess.run([
-                    "yt-dlp",
-                    "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-                    "--merge-output-format", "mp4",
-                    "-o", output_file,
-                    "--max-downloads", "1",
-                    search_target
-                ], timeout=90, check=True)
-                success = True
-            except Exception as e:
-                print(f"Failed to download clip {i} from YouTube Shorts: {e}")
+        print(f"\n--- Processing Clip {i} ---")
+        print(f"Queries to try: {queries}")
         
+        # 1) Try TikTok for all queries first (Preferred: No watermark)
+        for query in queries:
+            if success: break
+            print(f"Downloading clip {i}: '{query}' (Trying TikTok)")
+            try:
+                safe_query = urllib.parse.quote(query + " shorts")
+                tikwm_url = f"https://www.tikwm.com/api/feed/search?keywords={safe_query}&count=5"
+                req = urllib.request.Request(tikwm_url, headers={'User-Agent': 'Mozilla/5.0'})
+                with urllib.request.urlopen(req, timeout=15) as res:
+                    data = json.loads(res.read())
+                
+                videos = data.get('data', {}).get('videos', [])
+                if videos and len(videos) > 0:
+                    play_url = videos[0].get('play')
+                    if play_url:
+                        video_req = urllib.request.Request(play_url, headers={'User-Agent': 'Mozilla/5.0'})
+                        with urllib.request.urlopen(video_req, timeout=30) as v_res:
+                            with open(output_file, 'wb') as f:
+                                f.write(v_res.read())
+                        print(f"Successfully downloaded clip {i} from TikTok using '{query}'.")
+                        success = True
+                if not success:
+                    print(f"TikTok API returned no valid video for '{query}'.")
+            except Exception as e:
+                print(f"TikTok search/download failed for '{query}': {e}")
+            
+            if not success:
+                time.sleep(1) # Be nice to the API before next query
+            
+        # 2) Fallback to YouTube Shorts for all queries
+        if not success:
+            for query in queries:
+                if success: break
+                search_target = f"ytsearch1:{query} shorts"
+                print(f"Downloading clip {i}: '{query}' (via YouTube Shorts fallback)")
+                try:
+                    subprocess.run([
+                        "yt-dlp",
+                        "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+                        "--merge-output-format", "mp4",
+                        "-o", output_file,
+                        "--max-downloads", "1",
+                        "--no-warnings",
+                        search_target
+                    ], timeout=90, check=True)
+                    print(f"Successfully downloaded clip {i} from YouTube Shorts using '{query}'.")
+                    success = True
+                except Exception as e:
+                    print(f"Failed to download clip {i} from YouTube Shorts using '{query}': {e}")
+
         if success:
             downloaded_count += 1
+        else:
+            print(f"WARNING: Completely failed to download clip {i} after trying {len(queries)} queries.")
 
     if downloaded_count == 0:
         raise RuntimeError("Failed to download any clips from either TikTok or YouTube Shorts. The video would run as a black screen. Aborting pipeline.")
