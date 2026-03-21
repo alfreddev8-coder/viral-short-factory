@@ -64,9 +64,17 @@ async def generate_voice():
         return
     import edge_tts
     voice = VOICE_MAP.get(VOICE_STYLE, "en-US-GuyNeural")
-    communicate = edge_tts.Communicate(SCRIPT, voice)
-    await communicate.save(str(OUTPUT_DIR / "narration.mp3"))
-    print(f"Generated voiceover with {voice}")
+    try:
+        communicate = edge_tts.Communicate(SCRIPT, voice)
+        await communicate.save(str(OUTPUT_DIR / "narration.mp3"))
+        print(f"Generated voiceover with {voice} (edge-tts)")
+    except Exception as e:
+        print(f"edge-tts failed (possibly IP block): {e}")
+        print("Falling back to gTTS...")
+        from gtts import gTTS
+        tts = gTTS(text=SCRIPT, lang='en', slow=False)
+        tts.save(str(OUTPUT_DIR / "narration.mp3"))
+        print("Generated voiceover with gTTS fallback")
 
 # Step 2: Download clips (Try TikTok first, fallback to YouTube Shorts)
 def download_clips():
