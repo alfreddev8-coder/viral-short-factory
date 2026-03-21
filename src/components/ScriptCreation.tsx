@@ -123,7 +123,7 @@ export default function ScriptCreation() {
   };
 
   const handleGenerateScript = async () => {
-    if (!groqApiKey) { showToast('Please enter your Groq API key', 'error'); return; }
+    if (!groqApiKey) { showToast('Please set GROQ_API_KEY in .env/Vercel', 'error'); return; }
     if (!groqModel) { showToast('Please select a model', 'error'); return; }
     setIsGenerating(true);
     try {
@@ -138,7 +138,7 @@ export default function ScriptCreation() {
   };
 
   const handleGenerateTimestamps = async () => {
-    if (!groqApiKey || !groqModel) { showToast('Set API key and model first', 'error'); return; }
+    if (!groqApiKey || !groqModel) { showToast('Check API key in .env and model', 'error'); return; }
     const scriptText = localScript || project.rawScript;
     if (!scriptText.trim()) { showToast('Script is empty', 'error'); return; }
     setIsGenerating(true);
@@ -270,18 +270,7 @@ export default function ScriptCreation() {
       {/* API Key + Model */}
       <div className="glass-card rounded-xl p-4 mb-6 space-y-3">
         <div className="flex items-start gap-3 flex-col sm:flex-row">
-          <div className="flex-1 w-full">
-            <label className="text-xs font-semibold text-surface-300 uppercase tracking-wider mb-1.5 block">
-              Groq API Key {groqApiKey && groqModels.length > 0 && <span className="text-accent-green">✓ Connected</span>}
-            </label>
-            <input
-              type="password"
-              value={groqApiKey}
-              onChange={(e) => handleApiKeyChange(e.target.value)}
-              placeholder="gsk_..."
-              className="w-full bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-surface-400 text-sm font-mono"
-            />
-          </div>
+          {/* API Key removed from UI as per requirements, relying on .env */}
           <div className="flex-1 w-full">
             <label className="text-xs font-semibold text-surface-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5 block">
               <Cpu size={11} /> Model

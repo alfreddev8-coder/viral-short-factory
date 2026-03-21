@@ -26,13 +26,13 @@ export default function Production() {
     project, updateProject, setStep, showToast,
     productionSteps, setProductionSteps, updateProductionStep,
     addToHistory,
-    ghToken, setGhToken, ghOwner, setGhOwner, ghRepo, setGhRepo,
+    ghToken, ghOwner, ghRepo,
   } = useStore();
 
   const [isRunning, setIsRunning] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('pipeline');
-  const [showGhSetup, setShowGhSetup] = useState(false);
+  // const [showGhSetup, setShowGhSetup] = useState(false); // Removed
   const [ghTriggered, setGhTriggered] = useState(false);
   const [ghRunUrl, setGhRunUrl] = useState(project.workflowRunUrl || '');
   const [ghRunStatus, setGhRunStatus] = useState<string>('');
@@ -103,8 +103,7 @@ export default function Production() {
   // Trigger real GitHub Actions workflow
   const triggerGitHubWorkflow = async () => {
     if (!ghToken || !ghOwner || !ghRepo) {
-      showToast('Fill in GitHub settings first', 'error');
-      setShowGhSetup(true);
+      showToast('Please configure GH_TOKEN, GH_OWNER, GH_REPO in .env/Vercel', 'error');
       return;
     }
 
@@ -292,34 +291,15 @@ export default function Production() {
         </div>
       </div>
 
-      {/* GitHub Settings */}
+      {/* GitHub Settings (Read-only from .env) */}
       <div className="glass-card rounded-xl p-4 mb-6">
-        <button
-          onClick={() => setShowGhSetup(!showGhSetup)}
-          className="flex items-center gap-2 text-sm font-semibold text-white w-full"
-        >
+        <div className="flex items-center gap-2 text-sm font-semibold text-white w-full">
           <Settings size={16} className="text-surface-400" />
           GitHub Actions Settings
           <span className="text-xs text-surface-400 font-normal ml-2">
-            {ghToken && ghOwner && ghRepo ? '✅ Configured' : '⚠️ Required for real automation'}
+            {ghToken && ghOwner && ghRepo ? '✅ Configured via .env' : '⚠️ Missing GH_TOKEN/OWNER/REPO in .env'}
           </span>
-        </button>
-        {showGhSetup && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 animate-slide-up">
-            <div>
-              <label className="text-xs text-surface-400 mb-1 block">GitHub Token</label>
-              <input type="password" value={ghToken} onChange={(e) => setGhToken(e.target.value)} placeholder="ghp_..." className="w-full bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-surface-400 text-xs font-mono" />
-            </div>
-            <div>
-              <label className="text-xs text-surface-400 mb-1 block">Owner (username)</label>
-              <input type="text" value={ghOwner} onChange={(e) => setGhOwner(e.target.value)} placeholder="your-username" className="w-full bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-surface-400 text-xs" />
-            </div>
-            <div>
-              <label className="text-xs text-surface-400 mb-1 block">Repo Name</label>
-              <input type="text" value={ghRepo} onChange={(e) => setGhRepo(e.target.value)} placeholder="viral-shorts-factory" className="w-full bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-surface-400 text-xs" />
-            </div>
-          </div>
-        )}
+        </div>
       </div>
 
       {/* Tabs */}

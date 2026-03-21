@@ -133,7 +133,7 @@ export const useStore = create<AppStore>((set, get) => ({
       ),
     })),
 
-  groqApiKey: '',
+  groqApiKey: import.meta.env.GROQ_API_KEY || '',
   setGroqApiKey: (key) => set({ groqApiKey: key }),
   groqModel: '',
   setGroqModel: (model) => set({ groqModel: model }),
@@ -142,11 +142,11 @@ export const useStore = create<AppStore>((set, get) => ({
   modelsLoading: false,
   setModelsLoading: (v) => set({ modelsLoading: v }),
 
-  ghToken: '',
+  ghToken: import.meta.env.GH_TOKEN || '',
   setGhToken: (v) => set({ ghToken: v }),
-  ghOwner: '',
+  ghOwner: import.meta.env.GH_OWNER || '',
   setGhOwner: (v) => set({ ghOwner: v }),
-  ghRepo: '',
+  ghRepo: import.meta.env.GH_REPO || '',
   setGhRepo: (v) => set({ ghRepo: v }),
 
   isGenerating: false,
