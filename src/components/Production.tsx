@@ -113,17 +113,28 @@ export default function Production() {
       if ((project.voiceMode === 'upload' || project.voiceMode === 'mp3-first') && project.mp3File) {
         showToast('Uploading custom audio for GitHub Actions...', 'info');
         try {
-          const formData = new FormData();
-          formData.append('reqtype', 'fileupload');
-          formData.append('fileToUpload', project.mp3File);
-          const upRes = await fetch('https://catbox.moe/user/api.php', {
-            method: 'POST', body: formData
+          const cleanRepo = ghRepo.split('/').pop()?.replace(/\.git$/, '') || ghRepo;
+          const reader = new FileReader();
+          reader.readAsDataURL(project.mp3File);
+          await new Promise((res) => { reader.onload = res });
+          const base64data = (reader.result as string).split(',')[1];
+
+          const filename = `uploads/audio-${Date.now()}.mp3`;
+          const putRes = await fetch(`https://api.github.com/repos/${ghOwner}/${cleanRepo}/contents/${filename}`, {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${ghToken}`,
+              Accept: 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: `Upload custom audio for workflow`,
+              content: base64data,
+            })
           });
-          if (!upRes.ok) throw new Error('Upload failed');
-          const finalUrl = await upRes.text();
-          if (finalUrl && finalUrl.startsWith('http')) {
-            audioUrl = finalUrl.trim();
-          }
+
+          if (!putRes.ok) throw new Error('GitHub upload failed');
+          audioUrl = filename;
         } catch (e) {
           console.error('Audio upload error:', e);
           showToast('Failed to upload audio to temp server. Video might have no sound.', 'error');

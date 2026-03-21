@@ -40,16 +40,25 @@ def time_to_seconds(t: str) -> float:
 async def generate_voice():
     if VOICE_MODE in ("upload", "mp3-first"):
         if AUDIO_URL:
-            import urllib.request
-            print(f"Downloading uploaded custom audio from {AUDIO_URL}")
-            try:
-                # Provide a User-Agent to prevent 403s on some hosts
-                req = urllib.request.Request(AUDIO_URL, headers={'User-Agent': 'Mozilla/5.0'})
-                with urllib.request.urlopen(req) as response, open(OUTPUT_DIR / "narration.mp3", 'wb') as out_file:
-                    out_file.write(response.read())
-                print("Custom audio downloaded successfully.")
-            except Exception as e:
-                raise RuntimeError(f"Failed to download custom audio from {AUDIO_URL}: {e}")
+            if AUDIO_URL.startswith("uploads/"):
+                import shutil
+                print(f"Copying uploaded custom audio from repository: {AUDIO_URL}")
+                try:
+                    shutil.copy(AUDIO_URL, OUTPUT_DIR / "narration.mp3")
+                    print("Custom audio copied successfully.")
+                except Exception as e:
+                    raise RuntimeError(f"Failed to copy custom audio from repo path {AUDIO_URL}: {e}")
+            else:
+                import urllib.request
+                print(f"Downloading uploaded custom audio from {AUDIO_URL}")
+                try:
+                    # Provide a User-Agent to prevent 403s on some hosts
+                    req = urllib.request.Request(AUDIO_URL, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req) as response, open(OUTPUT_DIR / "narration.mp3", 'wb') as out_file:
+                        out_file.write(response.read())
+                    print("Custom audio downloaded successfully.")
+                except Exception as e:
+                    raise RuntimeError(f"Failed to download custom audio from {AUDIO_URL}: {e}")
         else:
             raise RuntimeError("Using uploaded MP3 mode but no custom AUDIO_URL was provided. Audio is missing. Aborting.")
         return
