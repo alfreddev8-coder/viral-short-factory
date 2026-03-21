@@ -122,7 +122,7 @@ export default function Production() {
           if (!upRes.ok) throw new Error('Upload failed');
           const upData = await upRes.json();
           if (upData?.data?.url) {
-            audioUrl = upData.data.url.replace('tmpfiles.org/', 'tmpfiles.org/api/v1/dl/');
+            audioUrl = upData.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
           }
         } catch (e) {
           console.error('Audio upload error:', e);
