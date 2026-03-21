@@ -623,10 +623,10 @@ export default function ScriptCreation() {
               </h4>
               <div className="space-y-2">
                 {project.metadataOptions.titles.map((title, idx) => (
-                  <button
+                  <div
                     key={idx}
                     onClick={() => selectTitle(idx)}
-                    className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 group ${
+                    className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 group cursor-pointer ${
                       project.selectedTitleIndex === idx
                         ? 'border-accent-green bg-accent-green/10 ring-2 ring-accent-green/20'
                         : 'border-surface-600 bg-surface-800 hover:border-surface-400'
@@ -642,11 +642,11 @@ export default function ScriptCreation() {
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); copyText(title); }}
-                      className="opacity-0 group-hover:opacity-100 text-surface-400 hover:text-white transition-all"
+                      className="opacity-0 group-hover:opacity-100 text-surface-400 hover:text-white transition-all p-1 hover:bg-surface-700 rounded-md"
                     >
                       <Copy size={14} />
                     </button>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -663,10 +663,10 @@ export default function ScriptCreation() {
                 {project.metadataOptions.descriptions.map((desc, idx) => {
                   const labels = ['🎯 Curiosity-Driven', '📊 Fact-Based', '💥 Emotional'];
                   return (
-                    <button
+                    <div
                       key={idx}
                       onClick={() => selectDescription(idx)}
-                      className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 group ${
+                      className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 group cursor-pointer ${
                         project.selectedDescriptionIndex === idx
                           ? 'border-accent-green bg-accent-green/10 ring-2 ring-accent-green/20'
                           : 'border-surface-600 bg-surface-800 hover:border-surface-400'
@@ -683,11 +683,11 @@ export default function ScriptCreation() {
                       </div>
                       <button
                         onClick={(e) => { e.stopPropagation(); copyText(desc); }}
-                        className="opacity-0 group-hover:opacity-100 text-surface-400 hover:text-white transition-all"
+                        className="opacity-0 group-hover:opacity-100 text-surface-400 hover:text-white transition-all p-1 hover:bg-surface-700 rounded-md"
                       >
                         <Copy size={14} />
                       </button>
-                    </button>
+                    </div>
                   );
                 })}
               </div>

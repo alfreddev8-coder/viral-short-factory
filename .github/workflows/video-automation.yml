@@ -33,6 +33,9 @@ on:
       tags:
         description: 'Video tags (comma separated)'
         required: false
+      PEXELS_API_KEY:
+        description: 'Pexels API Key'
+        required: false
 
 jobs:
   produce-video:
@@ -61,6 +64,7 @@ jobs:
           VOICE_MODE: ${{ github.event.inputs.voice_mode }}
           VOICE_STYLE: ${{ github.event.inputs.voice_style }}
           AUDIO_URL: ${{ github.event.inputs.audio_url }}
+          PEXELS_API_KEY: ${{ github.event.inputs.PEXELS_API_KEY }}
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           PYTHONUNBUFFERED: "1"
