@@ -6,6 +6,9 @@ on:
       project_id:
         description: 'Project ID'
         required: true
+      project_title:
+        description: 'Video Title (for history/naming)'
+        required: false
       niche:
         description: 'Content niche'
         required: true
@@ -24,14 +27,20 @@ on:
       audio_url:
         description: 'Temporary URL for uploaded custom audio'
         required: false
-      title:
-        description: 'Video title'
+      scraper_mode:
+        description: 'Scraper Mode (auto/pexels/tiktok)'
         required: false
-      description:
-        description: 'Video description'
+      caption_color:
+        description: 'Caption Highlighting Color'
         required: false
-      tags:
-        description: 'Video tags (comma separated)'
+      caption_font:
+        description: 'Caption Font'
+        required: false
+      caption_size:
+        description: 'Caption Font Size'
+        required: false
+      show_memes:
+        description: 'Toggle Meme Overlays'
         required: false
       PEXELS_API_KEY:
         description: 'Pexels API Key'
@@ -62,12 +71,18 @@ jobs:
       - name: Run automation pipeline
         env:
           PROJECT_ID: ${{ github.event.inputs.project_id }}
+          PROJECT_TITLE: ${{ github.event.inputs.project_title }}
           NICHE: ${{ github.event.inputs.niche }}
           SCRIPT: ${{ github.event.inputs.script }}
           SEGMENTS_JSON: ${{ github.event.inputs.segments_json }}
           VOICE_MODE: ${{ github.event.inputs.voice_mode }}
           VOICE_STYLE: ${{ github.event.inputs.voice_style }}
           AUDIO_URL: ${{ github.event.inputs.audio_url }}
+          SCRAPER_MODE: ${{ github.event.inputs.scraper_mode }}
+          CAPTION_COLOR: ${{ github.event.inputs.caption_color }}
+          CAPTION_FONT: ${{ github.event.inputs.caption_font }}
+          CAPTION_SIZE: ${{ github.event.inputs.caption_size }}
+          SHOW_MEMES: ${{ github.event.inputs.show_memes }}
           PEXELS_API_KEY: ${{ github.event.inputs.PEXELS_API_KEY }}
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}

@@ -37,9 +37,15 @@ export interface ProjectData {
   workflowRunId: number | null;
   workflowRunUrl: string;
   videoUrl: string;
+  // Advanced Settings
+  scraperMode: 'auto' | 'pexels' | 'tiktok';
+  captionColor: string;
+  captionFont: string;
+  captionSize: number;
+  showMemes: boolean;
 }
 
-export type Step = 1 | 2 | 3 | 4;
+export type Step = 1 | 2 | 3 | 4 | 'history';
 
 export interface NicheOption {
   id: string;

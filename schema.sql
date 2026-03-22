@@ -7,6 +7,16 @@ CREATE TABLE IF NOT EXISTS projects (
   voiceStyle TEXT,
   status TEXT DEFAULT 'pending',
   mp3File TEXT,
+  title TEXT,
+  description TEXT,
+  tags TEXT,
+  video_url TEXT,
+  workflow_run_id TEXT,
+  scraper_mode TEXT DEFAULT 'auto',
+  caption_color TEXT DEFAULT '#FFFF00',
+  caption_font TEXT DEFAULT 'DejaVu-Sans-Bold',
+  caption_size INTEGER DEFAULT 80,
+  show_memes BOOLEAN DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

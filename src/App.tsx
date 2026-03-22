@@ -3,9 +3,10 @@ import NicheSelection from './components/NicheSelection';
 import ScriptCreation from './components/ScriptCreation';
 import VoiceSetup from './components/VoiceSetup';
 import Production from './components/Production';
+import HistoryView from './components/History';
 import {
   Clapperboard, ListChecks, FileText, Mic, Rocket,
-  CheckCircle2, X, AlertCircle, Info, RotateCcw, History
+  CheckCircle2, X, AlertCircle, Info, RotateCcw, History as HistoryIcon
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -66,39 +67,20 @@ function Toast() {
   );
 }
 
-function ProjectHistory() {
-  const { history } = useStore();
-  const [open, setOpen] = useState(false);
-
-  if (history.length === 0) return null;
-
+function HistoryButton() {
+  const { currentStep, setStep } = useStore();
   return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-800 text-surface-300 hover:text-white rounded-lg text-xs font-medium transition-all border border-surface-700"
-      >
-        <History size={12} />
-        <span className="hidden md:inline">History ({history.length})</span>
-      </button>
-      {open && (
-        <div className="absolute right-0 top-full mt-2 w-72 bg-surface-800 border border-surface-600 rounded-xl shadow-2xl z-40 overflow-hidden">
-          <div className="p-3 border-b border-surface-700 text-xs font-semibold text-surface-300">
-            Recent Projects
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            {history.map((proj) => (
-              <div key={proj.id} className="p-3 border-b border-surface-700/50 hover:bg-surface-700/50">
-                <div className="text-sm font-medium text-white">{proj.nicheEmoji} {proj.title || proj.niche}</div>
-                <div className="text-[10px] text-surface-400 mt-0.5">
-                  {proj.segments.length} segments • {proj.status} • {new Date(proj.createdAt).toLocaleDateString()}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+    <button
+      onClick={() => setStep(currentStep === 'history' ? 1 : 'history')}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+        currentStep === 'history' 
+          ? 'bg-brand-600 border-brand-500 text-white' 
+          : 'bg-surface-800 border-surface-700 text-surface-300 hover:text-white'
+      }`}
+    >
+      <HistoryIcon size={12} />
+      <span className="hidden md:inline">{currentStep === 'history' ? 'Back' : 'History'}</span>
+    </button>
   );
 }
 
@@ -123,7 +105,7 @@ export default function App() {
           <StepIndicator />
 
           <div className="flex items-center gap-2">
-            <ProjectHistory />
+            <HistoryButton />
             <button
               onClick={resetProject}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-800 text-surface-300 hover:text-white rounded-lg text-xs font-medium transition-all border border-surface-700"
@@ -160,6 +142,7 @@ export default function App() {
         {currentStep === 2 && <ScriptCreation />}
         {currentStep === 3 && <VoiceSetup />}
         {currentStep === 4 && <Production />}
+        {currentStep === 'history' && <HistoryView />}
       </main>
 
       {/* Footer */}

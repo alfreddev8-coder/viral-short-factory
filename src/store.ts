@@ -81,6 +81,11 @@ const emptyProject: ProjectData = {
   workflowRunId: null,
   workflowRunUrl: '',
   videoUrl: '',
+  scraperMode: 'auto',
+  captionColor: '#FFFF00',
+  captionFont: 'DejaVu-Sans-Bold',
+  captionSize: 80,
+  showMemes: false,
 };
 
 export const useStore = create<AppStore>((set, get) => ({

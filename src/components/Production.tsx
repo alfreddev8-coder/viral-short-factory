@@ -39,6 +39,7 @@ export default function Production() {
   const [ghRunStatus, setGhRunStatus] = useState<string>('');
   const [isDownloadingArtifact, setIsDownloadingArtifact] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(project.videoUrl || null);
+  const [showExpert, setShowExpert] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleDownloadVideo = async () => {
@@ -159,6 +160,7 @@ export default function Production() {
         workflowFile: 'video-automation.yml',
         inputs: {
           project_id: project.id,
+          project_title: project.title,
           niche: project.niche,
           script: project.rawScript || project.segments.map(s => s.text).join(' '),
           segments_json: JSON.stringify(project.segments.map(s => ({
@@ -168,9 +170,11 @@ export default function Production() {
           voice_mode: project.voiceMode,
           voice_style: project.voiceStyle,
           audio_url: audioUrl,
-          title: project.title,
-          description: project.description,
-          tags: project.tags.join(','),
+          scraper_mode: project.scraperMode,
+          caption_color: project.captionColor,
+          caption_font: project.captionFont,
+          caption_size: project.captionSize.toString(),
+          show_memes: project.showMemes ? 'true' : 'false',
           PEXELS_API_KEY: pexelsApiKey,
         },
       });
@@ -389,7 +393,84 @@ export default function Production() {
 
       {/* ===== PIPELINE TAB ===== */}
       {activeTab === 'pipeline' && (
-        <div className="space-y-4 mb-6">
+          {/* Expert Settings */}
+          <div className="glass-card rounded-xl p-4 border border-surface-700">
+            <button 
+              onClick={() => setShowExpert(!showExpert)}
+              className="w-full flex items-center justify-between text-sm font-semibold text-white"
+            >
+              <div className="flex items-center gap-2">
+                <Settings size={16} className="text-brand-400" />
+                Expert Settings (Viral Branding)
+              </div>
+              <span className="text-[10px] text-surface-400 bg-surface-800 px-2 py-0.5 rounded uppercase tracking-widest font-bold">
+                {showExpert ? 'Close' : 'Configure'}
+              </span>
+            </button>
+            
+            {showExpert && (
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 animate-slide-up">
+                <div>
+                  <label className="text-[10px] text-surface-400 uppercase tracking-wider mb-1.5 block">Scraper Mode</label>
+                  <select 
+                    value={project.scraperMode}
+                    onChange={(e) => updateProject({ scraperMode: e.target.value as any })}
+                    className="w-full bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                  >
+                    <option value="auto">Auto (Smart Selection)</option>
+                    <option value="tiktok">Force TikTok (Best for Viral)</option>
+                    <option value="pexels">Force Pexels (Clean/Aesthetic)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] text-surface-400 uppercase tracking-wider mb-1.5 block">Caption Style</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="color" 
+                      value={project.captionColor === 'yellow' ? '#FFFF00' : project.captionColor}
+                      onChange={(e) => updateProject({ captionColor: e.target.value })}
+                      className="w-10 h-8 bg-surface-800 border border-surface-600 rounded cursor-pointer"
+                    />
+                    <select 
+                      value={project.captionFont}
+                      onChange={(e) => updateProject({ captionFont: e.target.value })}
+                      className="flex-1 bg-surface-800 border border-surface-600 rounded-lg px-2 py-1 text-xs text-white"
+                    >
+                      <option value="DejaVu-Sans-Bold">Standard Bold</option>
+                      <option value="Arial-Bold">Arial Bold</option>
+                      <option value="Impact">Impact (Classic Viral)</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-surface-400 uppercase tracking-wider mb-1.5 block">Caption Size</label>
+                  <input 
+                    type="range" min="40" max="120" 
+                    value={project.captionSize}
+                    onChange={(e) => updateProject({ captionSize: parseInt(e.target.value) })}
+                    className="w-full"
+                  />
+                  <div className="text-[10px] text-surface-500 text-right mt-1">{project.captionSize}px</div>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-surface-800 rounded-lg border border-surface-700">
+                  <div className="flex items-center gap-2">
+                    <Zap size={14} className="text-accent-orange" />
+                    <div>
+                      <div className="text-xs font-bold text-white">Green Screen Memes</div>
+                      <div className="text-[10px] text-surface-400">Random viral overlays</div>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => updateProject({ showMemes: !project.showMemes })}
+                    className={`w-10 h-5 rounded-full relative transition-all ${project.showMemes ? 'bg-brand-500' : 'bg-surface-600'}`}
+                  >
+                    <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${project.showMemes ? 'left-6' : 'left-1'}`} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {!isRunning && !isComplete && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <button
