@@ -393,6 +393,7 @@ export default function Production() {
 
       {/* ===== PIPELINE TAB ===== */}
       {activeTab === 'pipeline' && (
+        <>
           {/* Expert Settings */}
           <div className="glass-card rounded-xl p-4 border border-surface-700">
             <button 
@@ -555,7 +556,7 @@ export default function Production() {
               </button>
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* ===== RESULTS TAB — Final video + copyable metadata ===== */}
