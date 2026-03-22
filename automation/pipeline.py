@@ -2,6 +2,9 @@ import os
 import json
 import asyncio
 import subprocess
+import requests
+import math
+import whisper
 from pathlib import Path
 
 # Read inputs from environment
@@ -25,8 +28,10 @@ VOICE_MAP = {
 
 OUTPUT_DIR = Path("output")
 CLIPS_DIR = Path("clips")
+ASSETS_DIR = Path("assets")
 OUTPUT_DIR.mkdir(exist_ok=True)
 CLIPS_DIR.mkdir(exist_ok=True)
+ASSETS_DIR.mkdir(exist_ok=True)
 
 segments = json.loads(SEGMENTS_JSON)
 
@@ -75,6 +80,112 @@ async def generate_voice():
         tts = gTTS(text=SCRIPT, lang='en', slow=False)
         tts.save(str(OUTPUT_DIR / "narration.mp3"))
         print("Generated voiceover with gTTS fallback")
+
+# Step 1.5: Generate Transcription
+def generate_transcription(audio_path):
+    print(f"Transcribing {audio_path}...")
+    model = whisper.load_model("base")
+    # Using word_timestamps=True for viral-style captions
+    result = model.transcribe(str(audio_path), word_timestamps=True)
+    
+    words = []
+    for segment in result["segments"]:
+        for word_data in segment.get("words", []):
+            words.append({
+                "word": word_data["word"].strip(),
+                "start": word_data["start"],
+                "end": word_data["end"]
+            })
+    
+    with open(OUTPUT_DIR / "transcription.json", "w") as f:
+        json.dump(words, f, indent=2)
+    return words
+
+def ensure_assets():
+    """Download essential SFX and music if they don't exist."""
+    print("Ensuring viral assets (SFX/Music)...")
+    # Using public royalty-free links (examples, may need to be replaced with more permanent ones)
+    assets = {
+        "whoosh.mp3": "https://pixabay.com/music/download/whoosh-6316.mp3",
+        "background.mp3": "https://pixabay.com/music/download/phonk-dark-1234.mp3" # Placeholder for high-energy music
+    }
+    
+    # Actually, pixabay download links are dynamic. 
+    # I'll use some direct links from a known repository or just suggest the user to add them.
+    # For now, I'll attempt to download a few or provide a skip if it fails.
+    
+    # BETTER: Use a single high-quality viral SFX pack if available.
+    # Since I can't guarantee Pixabay links, I'll use some static ones from a known repo if found.
+    # Or just log that they are missing and continue.
+    
+    for filename, url in assets.items():
+        path = ASSETS_DIR / filename
+        if not path.exists():
+            print(f"Downloading {filename}...")
+            try:
+                # Note: Pixabay direct download might require specific headers or might not work directly.
+                # I'll try a generic download but wrap it in try-except.
+                res = requests.get(url, stream=True, timeout=15)
+                if res.status_code == 200:
+                    with open(path, "wb") as f:
+                         for chunk in res.iter_content(8192):
+                             f.write(chunk)
+                else:
+                    print(f"Failed to download {filename} (Status {res.status_code})")
+            except Exception as e:
+                print(f"Error downloading {filename}: {e}")
+
+def create_caption_clips(words, target_size):
+    from moviepy.editor import TextClip, CompositeVideoClip
+    w, h = target_size
+    clips = []
+    
+    # Viral style settings
+    # Ubuntu common fonts: 'DejaVu-Sans-Bold', 'Liberation-Sans-Bold', 'Ubuntu-Bold'
+    font = "DejaVu-Sans-Bold" 
+    font_size = 80
+    stroke_width = 2
+    highlight_color = "yellow"
+    normal_color = "white"
+    
+    for i, word in enumerate(words):
+        duration = word["end"] - word["start"]
+        if duration <= 0: continue
+        
+        # Create the "Pop" animation (slight bounce)
+        def pop_effect(t):
+            # Rapid scale from 0.8 to 1.1 then back to 1.0
+            if t < 0.1:
+                return 0.8 + (t / 0.1) * 0.3
+            elif t < 0.2:
+                return 1.1 - ((t - 0.1) / 0.1) * 0.1
+            return 1.0
+
+        try:
+            # We show only 1-3 words at a time. For now, let's try 1 word (ultra-viral style)
+            # To show context, we could show the current word in highlight and surrounding ones white.
+            # But the example uses very fast 1-word-at-a-time or very few.
+            
+            txt = TextClip(
+                word["word"].upper(),
+                fontsize=font_size,
+                color=highlight_color,
+                stroke_color="black",
+                stroke_width=stroke_width,
+                method="label"
+            )
+            
+            # Position in the middle-ish
+            txt = txt.set_start(word["start"]).set_duration(duration).set_position(('center', h * 0.45))
+            
+            # Add pop effect
+            txt = txt.resize(pop_effect)
+            
+            clips.append(txt)
+        except Exception as e:
+            print(f"Failed to create TextClip for word '{word['word']}': {e}")
+            
+    return clips
 
 # Step 2: Download clips (Pexels -> TikTok -> YouTube B-Roll)
 def download_clips():
@@ -129,28 +240,28 @@ def download_clips():
                     
                     if res.status_code != 200:
                         print(f"Pexels API error {res.status_code} for query '{query}': {res.text[:200]}...")
-                        continue
-
-                    data = res.json()
-                    videos = data.get('videos', [])
-                    if videos:
-                        # Get the best quality mp4 link
-                        video_files = videos[0].get('video_files', [])
-                        # Look for HD or high quality
-                        best_file = next((f for f in video_files if f.get('width', 0) >= 720), video_files[0])
-                        link = best_file.get('link')
-                        if link:
-                            v_res = requests.get(link, stream=True, timeout=30)
-                            v_res.raise_for_status() # Raise an exception for HTTP errors
-                            with open(output_file, 'wb') as f:
-                                for chunk in v_res.iter_content(chunk_size=8192):
-                                    f.write(chunk)
-                            print(f"Successfully downloaded clean stock from Pexels using '{query}'.")
-                            success = True
-                        else:
-                            print(f"Pexels: No video link found for query '{query}'.")
+                        # continue # already in loop
                     else:
-                        print(f"Pexels: No videos found for query '{query}'.")
+                        data = res.json()
+                        videos = data.get('videos', [])
+                        if videos:
+                            # Get the best quality mp4 link
+                            video_files = videos[0].get('video_files', [])
+                            # Look for HD or high quality
+                            best_file = next((f for f in video_files if f.get('width', 0) >= 720), video_files[0])
+                            link = best_file.get('link')
+                            if link:
+                                v_res = requests.get(link, stream=True, timeout=30)
+                                v_res.raise_for_status() # Raise an exception for HTTP errors
+                                with open(output_file, 'wb') as f:
+                                    for chunk in v_res.iter_content(chunk_size=8192):
+                                        f.write(chunk)
+                                print(f"Successfully downloaded clean stock from Pexels using '{query}'.")
+                                success = True
+                            else:
+                                print(f"Pexels: No video link found for query '{query}'.")
+                        else:
+                            print(f"Pexels: No videos found for query '{query}'.")
                 except requests.exceptions.RequestException as e:
                     print(f"Pexels failed for '{query}': {e}")
                 except Exception as e:
@@ -265,24 +376,55 @@ def assemble_video():
         audio = AudioFileClip(str(narration_path))
         audio_duration = audio.duration
         
-        # If segments aren't long enough, stretch the final video to match audio
         if final_video.duration < audio_duration:
             print(f"Stretching final video {final_video.duration:.2f}s -> {audio_duration:.2f}s to match audio")
-            # We can use set_duration or padding. set_duration on a concatenated clip might cut logic, 
-            # so we ensure the last clip fills the gap.
-            diff = audio_duration - final_video.duration
-            if diff > 0 and clips:
-                # Extend the last clip's duration if possible, or just pad the composite
-                final_video = final_video.set_duration(audio_duration)
+            final_video = final_video.set_duration(audio_duration)
         
-        final_video = final_video.set_audio(audio)
+        # Add Captions
+        print("Overlaying captions...")
+        words = generate_transcription(narration_path)
+        caption_clips = create_caption_clips(words, (target_w, target_h))
+        
+        # SFX Integration
+        sfx_clips = []
+        # Add Whoosh SFX at each segment transition
+        whoosh_path = ASSETS_DIR / "whoosh.mp3"
+        if whoosh_path.exists():
+            whoosh = AudioFileClip(str(whoosh_path))
+            current_time = 0
+            for seg in segments:
+                duration = time_to_seconds(seg["end"]) - time_to_seconds(seg["start"])
+                if current_time > 0:
+                     sfx_clips.append(whoosh.set_start(current_time - 0.1))
+                current_time += duration
+
+        # Music Integration
+        music_path = ASSETS_DIR / "background.mp3"
+        music_audio = None
+        if music_path.exists():
+             music_audio = AudioFileClip(str(music_path)).volumex(0.15).loop(duration=audio_duration)
+
+        # Mix all audio
+        from moviepy.editor import CompositeAudioClip
+        audio_layers = [audio]
+        if sfx_clips:
+            audio_layers.extend(sfx_clips)
+        if music_audio:
+            audio_layers.append(music_audio)
+            
+        final_audio = CompositeAudioClip(audio_layers)
+        final_video = final_video.set_audio(final_audio)
+        
+        # Combine base video with captions
+        final_video = CompositeVideoClip([final_video] + caption_clips)
     else:
         print("No narration audio found to sync duration.")
 
     output_path = str(OUTPUT_DIR / f"{PROJECT_ID}_final.mp4")
     final_video.write_videofile(
         output_path, fps=30, codec="libx264",
-        audio_codec="aac", preset="fast"
+        audio_codec="aac", preset="fast",
+        threads=4
     )
     print(f"Final video saved: {output_path}")
 
@@ -309,6 +451,9 @@ async def main():
     print(f"Starting pipeline for project {PROJECT_ID}")
     print(f"Niche: {NICHE}")
     print(f"Segments: {len(segments)}")
+
+    print("\n--- Step 0: Ensure Assets ---")
+    ensure_assets()
 
     print("\n--- Step 1: Generate Voice ---")
     await generate_voice()

@@ -48,12 +48,16 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg imagemagick libmagickwand-dev
+          # Fix ImageMagick security policy to allow TextClip
+          sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@\*"/g' /etc/ImageMagick-6/policy.xml || true
 
       - name: Install Python dependencies
         run: |
-          pip install "moviepy<2.0.0" yt-dlp edge-tts libsql-experimental httpx "Pillow<10.0.0" gTTS requests
+          pip install "moviepy<2.0.0" yt-dlp edge-tts libsql-experimental httpx "Pillow<10.0.0" gTTS requests openai-whisper setuptools
 
       - name: Run automation pipeline
         env:
